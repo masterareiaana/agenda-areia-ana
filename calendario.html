@@ -191,7 +191,7 @@
       color: var(--text-soft);
     }
 
-    /* SEM fundo laranja, só um contorninho leve */
+    /* SEM fundo laranja, só contorno leve */
     .day-cell.has-event {
       background: #050814;
       box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
@@ -286,19 +286,22 @@
       position: relative;
       height: 22px;
       cursor: pointer;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.05s;
     }
 
     .mini-day span {
       font-size: 0.65rem;
     }
 
+    /* >>> AQUI EU TROQUEI: sem fundo laranja no anual também <<< */
     .mini-day.has-event {
-      background: rgba(255, 122, 26, 0.12);
-      box-shadow: inset 0 0 0 1px rgba(255, 122, 26, 0.25);
+      background: #050814;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
     }
 
     .mini-day:hover {
       background: #070c1a;
+      transform: translateY(-1px);
     }
 
     .mini-dot {
@@ -482,7 +485,6 @@
   </div>
 
   <script>
-    // === CONFIGURAÇÕES ===
     const URL_BASE = "https://agenda-areia-ana-default-rtdb.firebaseio.com/eventos.json";
 
     const mesesNomes = [
@@ -490,7 +492,6 @@
       "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ];
 
-    // Feriados fixos (Brasil) - só para exemplo
     const feriadosFixos = [
       { mes: 1,  dia: 1,  titulo: "Confraternização Universal" },
       { mes: 4,  dia: 21, titulo: "Tiradentes" },
@@ -517,15 +518,13 @@
     const legendEventos = document.getElementById("legendEventos");
 
     let anoAtual = new Date().getFullYear();
-    let mesAtual = new Date().getMonth(); // 0-11
-    let eventosCarregados = {}; // { id: { data, titulo, cor, tipoRecorrencia } }
+    let mesAtual = new Date().getMonth();
+    let eventosCarregados = {};
 
     let ultimoMapaAno = null;
     let ultimoAnoMapa = null;
 
-    // === INICIALIZAÇÃO ===
     function popularSelects() {
-      // Meses
       selectMes.innerHTML = "";
       mesesNomes.forEach((nome, idx) => {
         const opt = document.createElement("option");
@@ -535,7 +534,6 @@
       });
       selectMes.value = mesAtual;
 
-      // Anos (atual -2 até atual +3 para ter uma folga)
       selectAno.innerHTML = "";
       const anoBase = new Date().getFullYear();
       for (let a = anoBase - 2; a <= anoBase + 3; a++) {
@@ -560,12 +558,11 @@
       atualizarLegendaEventos();
     }
 
-    // Legenda dinâmica dos eventos
     function atualizarLegendaEventos() {
       legendEventos.innerHTML = "";
       if (!eventosCarregados) return;
 
-      const mapa = {}; // titulo -> cor
+      const mapa = {};
       Object.values(eventosCarregados).forEach(ev => {
         if (!ev || !ev.titulo) return;
         const cor = ev.cor || "#ff7a1a";
@@ -582,11 +579,9 @@
       });
     }
 
-    // Gera mapa { 'YYYY-MM-DD': [ { titulo, cor, feriado:bool } ] }
     function montarMapaEventos(ano) {
       const mapa = {};
 
-      // Feriados fixos (só ano atual solicitado)
       feriadosFixos.forEach(f => {
         const dataStr = `${ano}-${String(f.mes).padStart(2,"0")}-${String(f.dia).padStart(2,"0")}`;
         if (!mapa[dataStr]) mapa[dataStr] = [];
@@ -597,7 +592,6 @@
         });
       });
 
-      // Eventos vindos do Firebase
       if (eventosCarregados) {
         Object.values(eventosCarregados).forEach(ev => {
           if (!ev || !ev.data) return;
@@ -648,7 +642,6 @@
       return mapa;
     }
 
-    // Mostrar detalhes dos eventos de uma data
     function mostrarDetalhes(dataStr) {
       const [y, m, d] = dataStr.split("-");
       const ano = parseInt(y, 10);
@@ -678,7 +671,6 @@
       detalhesEvento.style.display = "block";
     }
 
-    // === RENDER MENSAL ===
     function desenharMensal(ano, mes) {
       const mapaEventos = montarMapaEventos(ano);
       ultimoMapaAno = mapaEventos;
@@ -705,7 +697,7 @@
       `;
 
       const primeiroDiaMes = new Date(ano, mes, 1);
-      const diaSemana = (primeiroDiaMes.getDay() + 6) % 7; // segunda=0
+      const diaSemana = (primeiroDiaMes.getDay() + 6) % 7;
       const inicioGrade = new Date(ano, mes, 1 - diaSemana);
 
       let dataCursor = new Date(inicioGrade);
@@ -752,7 +744,6 @@
       tabelaMensal.innerHTML = html;
     }
 
-    // === RENDER ANUAL ===
     function desenharAnual(ano) {
       const mapaEventos = montarMapaEventos(ano);
       ultimoMapaAno = mapaEventos;
@@ -786,7 +777,7 @@
         `;
 
         const primeiroDiaMes = new Date(ano, mes, 1);
-        const diaSemana = (primeiroDiaMes.getDay() + 6) % 7; // segunda=0
+        const diaSemana = (primeiroDiaMes.getDay() + 6) % 7;
         const inicioGrade = new Date(ano, mes, 1 - diaSemana);
         let cursor = new Date(inicioGrade);
 
@@ -827,7 +818,6 @@
       }
     }
 
-    // === TROCA DE MODO ===
     function atualizarVisualizacao() {
       const modo = selectModo.value;
       anoAtual = parseInt(selectAno.value, 10);
@@ -849,7 +839,6 @@
       }
     }
 
-    // === EVENTOS DE UI ===
     selectModo.addEventListener("change", atualizarVisualizacao);
     selectMes.addEventListener("change", () => {
       mesAtual = parseInt(selectMes.value, 10);
@@ -878,7 +867,6 @@
       atualizarVisualizacao();
     });
 
-    // Clique nas datas (mensal e anual)
     function handleClickData(e) {
       const cell = e.target.closest("td[data-date]");
       if (!cell) return;
@@ -889,7 +877,6 @@
     tabelaMensal.addEventListener("click", handleClickData);
     yearGrid.addEventListener("click", handleClickData);
 
-    // === START ===
     (async function init() {
       popularSelects();
       await carregarEventos();
@@ -898,3 +885,4 @@
   </script>
 </body>
 </html>
+V
