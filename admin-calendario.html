@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Calendário</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap">
+  <style>
+    :root {
+      --bg: #050814;
+      --card: #0b1020;
+      --card-soft: #101629;
+      --accent: #ff7a1a;
+      --accent-soft: #ffb200;
+      --text: #f5f7ff;
+      --soft: #c2c7ff;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, sans-serif;
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .wrapper {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px 22px 24px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+    }
+
+    h1 {
+      text-align: center;
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 12px;
+      color: var(--soft);
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: var(--card-soft);
+      padding: 16px 18px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--soft);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    input {
+      background:#050814;
+      color:#fff;
+    }
+
+    button {
+      background: var(--accent);
+      color:#000;
+      font-weight:bold;
+      cursor:pointer;
+    }
+
+    button:hover {
+      background: var(--accent-soft);
+    }
+
+    .events-list {
+      max-height: 260px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+
+    .event-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .event-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      color: var(--soft);
+      display: inline-block;
+    }
+
+    .color-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      margin-right: 4px;
+      display: inline-block;
+    }
+
+    .delete-btn {
+      background: transparent;
+      color: #ff6b6b;
+      border: 1px solid rgba(255,107,107,0.4);
+      padding: 4px 8px;
+      font-size: 11px;
+      width: auto;
+      border-radius: 999px;
+    }
+
+    .delete-btn:hover {
+      background: rgba(255,107,107,0.12);
+    }
+
+    .hidden { display:none; }
+
+    .small {
+      font-size: 11px;
+      color: var(--soft);
+      margin-top: 2px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <h1>Admin – Calendário</h1>
+    <p class="subtitle">Somente você edita. Usuários só visualizam o calendário pronto.</p>
+
+    <!-- LOGIN -->
+    <div class="card" id="loginCard">
+      <label>Login:</label>
+      <input type="text" id="login" placeholder="Digite seu usuário">
+
+      <label>Senha:</label>
+      <input type="password" id="senha" placeholder="Digite sua senha">
+
+      <button onclick="fazerLogin()">Entrar</button>
+      <div class="small">Login: <b>Agendaareiaana</b> • Senha: <b>areia2025</b> (depois você decora isso 😄)</div>
+    </div>
+
+    <!-- ADMIN ÁREA -->
+    <div id="adminArea" class="hidden">
+      <div class="card">
+        <label>Data do evento:</label>
+        <input type="date" id="data">
+
+        <label>Título:</label>
+        <input type="text" id="titulo" placeholder="Ex: Reunião de Alinhamento">
+
+        <label>Cor do evento:</label>
+        <input type="color" id="cor" value="#ff7a1a">
+
+        <button onclick="salvarEvento()">Incluir / Atualizar evento</button>
+        <div class="small">
+          Sempre que você salvar, o calendário dos usuários é atualizado automaticamente.
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px;">Eventos cadastrados</div>
+        <div class="events-list" id="listaEventos"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_LOGIN = "Agendaareiaana";
+    const ADMIN_SENHA  = "areia2025";
+    const DB_URL       = "https://agenda-areia-ana-default-rtdb.firebaseio.com";
+
+    let cacheEventos = {}; // objeto do Firebase (id -> evento)
+
+    function fazerLogin() {
+      const l = document.getElementById("login").value.trim();
+      const s = document.getElementById("senha").value.trim();
+
+      if (l === ADMIN_LOGIN && s === ADMIN_SENHA) {
+        document.getElementById("loginCard").classList.add("hidden");
+        document.getElementById("adminArea").classList.remove("hidden");
+        carregarEventos();
+      } else {
+        alert("Login ou senha inválidos.");
+      }
+    }
+
+    async function carregarEventos() {
+      try {
+        const resp = await fetch(DB_URL + "/eventos.json");
+        const dados = await resp.json();
+        cacheEventos = dados || {};
+        renderizarLista();
+      } catch (e) {
+        console.error("Erro ao carregar eventos:", e);
+        alert("Erro ao carregar eventos do banco.");
+      }
+    }
+
+    async function salvarEvento() {
+      const data = document.getElementById("data").value;
+      const titulo = document.getElementById("titulo").value.trim();
+      const cor = document.getElementById("cor").value;
+
+      if (!data || !titulo) {
+        alert("Preencha a data e o título.");
+        return;
+      }
+
+      const novo = { data, titulo, cor };
+
+      try {
+        await fetch(DB_URL + "/eventos.json", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(novo)
+        });
+
+        document.getElementById("titulo").value = "";
+        await carregarEventos();
+        alert("Evento salvo com sucesso!");
+      } catch (e) {
+        console.error("Erro ao salvar evento:", e);
+        alert("Erro ao salvar evento.");
+      }
+    }
+
+    async function excluirEvento(id) {
+      if (!confirm("Tem certeza que deseja excluir este evento?")) return;
+
+      try {
+        await fetch(DB_URL + "/eventos/" + id + ".json", {
+          method: "DELETE"
+        });
+        await carregarEventos();
+      } catch (e) {
+        console.error("Erro ao excluir evento:", e);
+        alert("Erro ao excluir evento.");
+      }
+    }
+
+    function renderizarLista() {
+      const lista = document.getElementById("listaEventos");
+      lista.innerHTML = "";
+
+      const arr = Object.entries(cacheEventos).map(([id, ev]) => ({ id, ...ev }));
+      arr.sort((a,b) => (a.data || "").localeCompare(b.data || ""));
+
+      if (arr.length === 0) {
+        lista.innerHTML = '<div class="small">Nenhum evento cadastrado ainda.</div>';
+        return;
+      }
+
+      arr.forEach(ev => {
+        const row = document.createElement("div");
+        row.className = "event-row";
+
+        const main = document.createElement("div");
+        main.className = "event-main";
+
+        const linha1 = document.createElement("div");
+        linha1.innerHTML = `<span class="badge">${ev.data}</span>`;
+
+        const linha2 = document.createElement("div");
+        linha2.innerHTML = `<span class="color-dot" style="background:${ev.cor};"></span>${ev.titulo}`;
+
+        main.appendChild(linha1);
+        main.appendChild(linha2);
+
+        const btn = document.createElement("button");
+        btn.className = "delete-btn";
+        btn.textContent = "Excluir";
+        btn.onclick = () => excluirEvento(ev.id);
+
+        row.appendChild(main);
+        row.appendChild(btn);
+
+        lista.appendChild(row);
+      });
+    }
+  </script>
+</body>
+</html>
