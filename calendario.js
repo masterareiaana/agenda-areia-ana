@@ -1,473 +1,353 @@
-// URL do nó "eventos" no Realtime Database (REST API)
-const DB_URL = "https://agenda-areia-ana-default-rtdb.firebaseio.com/eventos.json";
+// URL base do seu Realtime Database (sem /eventos.json no final)
+const BASE_URL = "https://agenda-areia-ana-default-rtdb.firebaseio.com";
 
-// Eventos da empresa (vêm do Firebase)
-let eventosGlobal = [];
-// Feriados nacionais calculados por ano
-let feriados = [];
-
-let mesAtual;
+let eventosGlobal = []; // [{data: '2025-12-15', titulo: 'Reunião', cor: '#ff7a1a'}, ...]
 let anoAtual;
-let modoAtual = "mes";   // "mes", "ano", "semestre", "dia"
-let semestreAtual = 1;   // 1º ou 2º semestre
+let mesAtual; // 0-11
 
 const mesesNomes = [
-  "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
-  "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
 ];
 
-function pad2(n) {
-  return String(n).padStart(2, "0");
-}
+const diasSemanaMini = ["S", "T", "Q", "Q", "S", "S", "D"];
 
-/* -------- FERIADOS FIXOS (nacionais) ---------- */
+const viewModeSelect = document.getElementById("viewMode");
+const yearSelect = document.getElementById("yearSelect");
+const monthSelect = document.getElementById("monthSelect");
+const monthWrapper = document.getElementById("monthWrapper");
+
+const prevMonthBtn = document.getElementById("prevMonthBtn");
+const nextMonthBtn = document.getElementById("nextMonthBtn");
+
+const monthTitle = document.getElementById("monthTitle");
+const annualTitle = document.getElementById("annualTitle");
+
+const monthlyView = document.getElementById("monthlyView");
+const annualView = document.getElementById("annualView");
+const calendarBody = document.getElementById("calendarBody");
+const annualGrid = document.getElementById("annualGrid");
+const dayInfo = document.getElementById("dayInfo");
+
+// util
+const pad2 = (n) => String(n).padStart(2, "0");
+
+// --------- FERIADOS FIXOS (BR) ----------
 function gerarFeriadosParaAno(ano) {
-  const fixos = [
-    { mes: 1,  dia: 1,  titulo: "Confraternização Universal" },
-    { mes: 4,  dia: 21, titulo: "Tiradentes" },
-    { mes: 5,  dia: 1,  titulo: "Dia do Trabalhador" },
-    { mes: 9,  dia: 7,  titulo: "Independência do Brasil" },
+  const f = [
+    { mes: 1, dia: 1, titulo: "Confraternização Universal" },
+    { mes: 4, dia: 21, titulo: "Tiradentes" },
+    { mes: 5, dia: 1, titulo: "Dia do Trabalho" },
+    { mes: 9, dia: 7, titulo: "Independência do Brasil" },
     { mes: 10, dia: 12, titulo: "Nossa Senhora Aparecida" },
-    { mes: 11, dia: 2,  titulo: "Finados" },
+    { mes: 11, dia: 2, titulo: "Finados" },
     { mes: 11, dia: 15, titulo: "Proclamação da República" },
     { mes: 12, dia: 25, titulo: "Natal" }
   ];
 
-  feriados = fixos.map(f => ({
-    data: `${ano}-${pad2(f.mes)}-${pad2(f.dia)}`,
-    titulo: f.titulo,
-    cor: "#808080",
-    tipo: "feriado"
+  return f.map((fer) => ({
+    data: `${ano}-${pad2(fer.mes)}-${pad2(fer.dia)}`,
+    titulo: fer.titulo
   }));
 }
 
-/* -------- CARREGA EVENTOS DO FIREBASE ---------- */
-async function carregarEventosDoFirebase() {
+// --------- CARREGAR EVENTOS DO FIREBASE ----------
+async function carregarEventos() {
   try {
-    const resp = await fetch(DB_URL);
-    const dados = await resp.json();
-    // se ainda não existe, fica []
-    eventosGlobal = Array.isArray(dados) ? dados : [];
+    const resp = await fetch(`${BASE_URL}/eventos.json`);
+    if (!resp.ok) throw new Error("Erro ao buscar eventos");
+    const data = await resp.json() || {};
+
+    const lista = [];
+    Object.keys(data).forEach((id) => {
+      const ev = data[id];
+      if (ev && ev.data && ev.titulo) {
+        lista.push({
+          data: ev.data,
+          titulo: ev.titulo,
+          cor: ev.cor || "#ff7a1a"
+        });
+      }
+    });
+
+    eventosGlobal = lista;
   } catch (e) {
-    console.warn("Não foi possível carregar eventos do Firebase.", e);
+    console.error("Erro carregando eventos:", e);
     eventosGlobal = [];
   }
 }
 
-/* -------- INIT ---------- */
-async function inicializarCalendario() {
-  await carregarEventosDoFirebase();
-
-  const hoje = new Date();
-  mesAtual = hoje.getMonth();        // 0..11
-  anoAtual = hoje.getFullYear();
-
-  gerarFeriadosParaAno(anoAtual);
-  preencherSelectsAnoMes();
-
-  const dateInput = document.getElementById("datePicker");
-  if (dateInput) {
-    dateInput.value = hoje.toISOString().slice(0, 10);
+// --------- POPULAR SELECTS ----------
+function popularAnos() {
+  const anoAgora = new Date().getFullYear();
+  yearSelect.innerHTML = "";
+  for (let ano = anoAgora - 2; ano <= anoAgora + 5; ano++) {
+    const opt = document.createElement("option");
+    opt.value = ano;
+    opt.textContent = ano;
+    yearSelect.appendChild(opt);
   }
-
-  alterarModo();
-  renderizarLegenda();
 }
 
-/* -------- SELECTs ANO / MÊS ---------- */
-
-function preencherSelectsAnoMes() {
-  const yearSel = document.getElementById("yearSelect");
-  const monthSel = document.getElementById("monthSelect");
-  if (!yearSel || !monthSel) return;
-
-  yearSel.innerHTML = "";
-  for (let y = anoAtual - 2; y <= anoAtual + 2; y++) {
-    const opt = document.createElement("option");
-    opt.value = y;
-    opt.textContent = y;
-    if (y === anoAtual) opt.selected = true;
-    yearSel.appendChild(opt);
-  }
-
-  monthSel.innerHTML = "";
-  mesesNomes.forEach((m, idx) => {
+function popularMeses() {
+  monthSelect.innerHTML = "";
+  mesesNomes.forEach((nome, idx) => {
     const opt = document.createElement("option");
     opt.value = idx;
-    opt.textContent = m;
-    if (idx === mesAtual) opt.selected = true;
-    monthSel.appendChild(opt);
+    opt.textContent = nome;
+    monthSelect.appendChild(opt);
   });
-
-  atualizarVisibilidadeSelectMes();
 }
 
-function atualizarVisibilidadeSelectMes() {
-  const wrapper = document.getElementById("monthLabelWrapper");
-  if (!wrapper) return;
-  wrapper.style.display = (modoAtual === "mes") ? "inline" : "none";
-}
+// --------- RENDER MENSAL ----------
+function renderMensal() {
+  const ano = anoAtual;
+  const mes = mesAtual;
 
-function alterarAno() {
-  const yearSel = document.getElementById("yearSelect");
-  if (!yearSel) return;
-  anoAtual = parseInt(yearSel.value, 10);
-  gerarFeriadosParaAno(anoAtual);
-  alterarModo();
-}
+  const hoje = new Date();
+  const hojeStr = `${hoje.getFullYear()}-${pad2(hoje.getMonth() + 1)}-${pad2(hoje.getDate())}`;
 
-function alterarMesSelect() {
-  const monthSel = document.getElementById("monthSelect");
-  if (!monthSel) return;
-  mesAtual = parseInt(monthSel.value, 10);
-  alterarModo();
-}
+  const feriadosAno = gerarFeriadosParaAno(ano);
 
-/* -------- LEGENDA ---------- */
+  monthTitle.textContent = `${mesesNomes[mes]} de ${ano}`;
+  calendarBody.innerHTML = "";
+  dayInfo.textContent = "Nenhuma data selecionada. Clique em um dia para ver os eventos.";
 
-function renderizarLegenda() {
-  const legendaEl = document.getElementById("legenda");
-  if (!legendaEl) return;
+  const primeiroDiaSemana = new Date(ano, mes, 1).getDay(); // 0-dom..6-sab
+  const diasMes = new Date(ano, mes + 1, 0).getDate();
 
-  const mapa = new Map();
+  // montar matriz 6 semanas x 7 dias
+  let dia = 1;
+  for (let semana = 1; semana <= 6; semana++) {
+    const tr = document.createElement("tr");
 
-  // Um título por cor (pega o primeiro que encontrar)
-  eventosGlobal.forEach(e => {
-    if (!mapa.has(e.cor)) {
-      mapa.set(e.cor, e.titulo);
+    const tdSemana = document.createElement("td");
+    tdSemana.className = "week-col";
+    tdSemana.textContent = semana;
+    tr.appendChild(tdSemana);
+
+    for (let dow = 1; dow <= 7; dow++) {
+      const td = document.createElement("td");
+      td.className = "day-cell";
+
+      const posGlobal = (semana - 1) * 7 + dow; // posição de 1..42
+      const offset = (primeiroDiaSemana + 6) % 7; // ajustar para semana começando em segunda
+
+      if (posGlobal <= offset || dia > diasMes) {
+        td.innerHTML = "";
+        tr.appendChild(td);
+        continue;
+      }
+
+      const dataStr = `${ano}-${pad2(mes + 1)}-${pad2(dia)}`;
+
+      const span = document.createElement("span");
+      span.className = "day-number";
+      span.textContent = dia;
+
+      // hoje
+      if (dataStr === hojeStr) {
+        td.classList.add("today");
+      }
+
+      // feriado?
+      const feriado = feriadosAno.find((f) => f.data === dataStr);
+      if (feriado) {
+        td.classList.add("holiday");
+        td.dataset.feriado = feriado.titulo;
+      }
+
+      // eventos?
+      const eventosDia = eventosGlobal.filter((ev) => ev.data === dataStr);
+      if (eventosDia.length > 0) {
+        td.classList.add("has-event");
+        // usa a cor do primeiro evento
+        span.style.background = eventosDia[0].cor || "#ff7a1a";
+      }
+
+      td.appendChild(span);
+
+      td.addEventListener("click", () => {
+        mostrarInfoDia(dataStr, feriado, eventosDia);
+      });
+
+      tr.appendChild(td);
+      dia++;
     }
-  });
 
-  if (feriados.length > 0) {
-    mapa.set("#808080", "Feriado nacional");
-  }
-
-  let html = `<div class="legend-title">Legenda de eventos</div>`;
-  if (mapa.size === 0) {
-    html += `<div style="color:#c2c7ff;font-size:11px;">
-               Sem eventos cadastrados ainda. Use a tela de administrador.
-             </div>`;
-  } else {
-    mapa.forEach((titulo, cor) => {
-      html += `
-        <div class="legend-item">
-          <div class="legend-color" style="background:${cor};"></div>
-          <span>${titulo}</span>
-        </div>
-      `;
-    });
-  }
-
-  legendaEl.innerHTML = html;
-}
-
-/* -------- CONTROLE DE MODO ---------- */
-
-function alterarModo() {
-  const select = document.getElementById("viewMode");
-  if (!select) return;
-  modoAtual = select.value;
-
-  const dateInput = document.getElementById("datePicker");
-  if (dateInput) {
-    dateInput.style.display = (modoAtual === "dia") ? "inline-block" : "none";
-  }
-
-  atualizarVisibilidadeSelectMes();
-
-  if (modoAtual === "mes") {
-    renderizarCalendarioMensal();
-  } else if (modoAtual === "ano") {
-    renderizarCalendarioAnual();
-  } else if (modoAtual === "semestre") {
-    renderizarCalendarioSemestral();
-  } else if (modoAtual === "dia") {
-    renderizarDia();
+    calendarBody.appendChild(tr);
+    if (dia > diasMes) break;
   }
 }
 
-/* -------- DETALHES ---------- */
-
-function atualizarDetalhesMensagem(titulo, corpoHtml) {
-  const detalhes = document.getElementById("detalhes");
-  if (!detalhes) return;
-  detalhes.innerHTML = `
-    <div class="details-title">${titulo}</div>
-    <div style="color:#c2c7ff;">${corpoHtml}</div>
-  `;
-}
-
-function mostrarEventosDoDia(dataStr) {
-  const todosEventos = [...eventosGlobal, ...feriados];
-  const eventosDia = todosEventos.filter(e => e.data === dataStr);
-
+function mostrarInfoDia(dataStr, feriado, eventosDia) {
   const [ano, mes, dia] = dataStr.split("-");
-  const dataFormatada = `${dia}/${mes}/${ano}`;
+  const tituloData = `${dia}/${mes}/${ano}`;
 
-  if (eventosDia.length === 0) {
-    atualizarDetalhesMensagem(
-      dataFormatada,
-      "Não há eventos cadastrados para esta data."
-    );
-    return;
+  let html = `<strong>${tituloData}</strong><br/>`;
+
+  if (!feriado && eventosDia.length === 0) {
+    html += "Nenhum evento cadastrado.";
+  } else {
+    if (feriado) {
+      html += `<span style="color: #aaaaaa;">• ${feriado.titulo} (feriado)</span><br/>`;
+    }
+    if (eventosDia.length > 0) {
+      html += `<div class="events-list">`;
+      eventosDia.forEach((ev) => {
+        html += `<div class="event-item"><span class="event-dot" style="background:${ev.cor};"></span>${ev.titulo}</div>`;
+      });
+      html += `</div>`;
+    }
   }
 
-  let html = "";
-  eventosDia.forEach(ev => {
-    html += `
-      <div class="event-item">
-        <div class="event-color" style="background:${ev.cor};"></div>
-        <span>${ev.titulo}</span>
-      </div>
-    `;
-  });
-
-  atualizarDetalhesMensagem(dataFormatada, html);
+  dayInfo.innerHTML = html;
 }
 
-/* -------- CALENDÁRIO MENSAL – TABELA ---------- */
+// --------- RENDER ANUAL ----------
+function renderAnual() {
+  const ano = anoAtual;
+  const feriadosAno = gerarFeriadosParaAno(ano);
 
-function renderizarCalendarioMensal() {
-  const container = document.getElementById("calendario");
-  if (!container) return;
+  annualTitle.textContent = `Ano de ${ano}`;
+  annualGrid.innerHTML = "";
 
-  const primeiroDia = new Date(anoAtual, mesAtual, 1);
-  const totalDias = new Date(anoAtual, mesAtual + 1, 0).getDate();
+  for (let mes = 0; mes < 12; mes++) {
+    const mini = document.createElement("div");
+    mini.className = "mini-month";
 
-  // getDay() 0=Dom...6=Sáb -> ajusta para 0=Seg
-  const jsDay = primeiroDia.getDay(); // 0..6
-  let inicioSemana = (jsDay + 6) % 7; // 0=Seg
+    const header = document.createElement("div");
+    header.className = "mini-month-header";
+    header.textContent = mesesNomes[mes];
+    mini.appendChild(header);
 
-  const todosEventos = [...eventosGlobal, ...feriados];
+    const table = document.createElement("table");
+    table.className = "mini-table";
 
-  let html = `
-    <div class="month-header">
-      <button class="nav-btn" onclick="mudarMes(-1)">&lt;</button>
-      <span>${mesesNomes[mesAtual]} ${anoAtual}</span>
-      <button class="nav-btn" onclick="mudarMes(1)">&gt;</button>
-    </div>
+    const thead = document.createElement("thead");
+    const trh = document.createElement("tr");
+    diasSemanaMini.forEach((d) => {
+      const th = document.createElement("th");
+      th.textContent = d;
+      trh.appendChild(th);
+    });
+    thead.appendChild(trh);
+    table.appendChild(thead);
 
-    <table class="cal-table">
-      <thead>
-        <tr>
-          <th class="week-col">Semana</th>
-          <th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sáb</th><th>Dom</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+    const tbody = document.createElement("tbody");
 
-  let diaAtual = 1;
-  let semana = 1;
+    const primeiroDiaSemana = new Date(ano, mes, 1).getDay(); // 0 dom..6 sab
+    const diasMes = new Date(ano, mes + 1, 0).getDate();
 
-  while (diaAtual <= totalDias) {
-    html += `<tr><td class="week-col">${semana}</td>`;
-    for (let col = 0; col < 7; col++) {
-      if (semana === 1 && col < inicioSemana) {
-        html += `<td class="day-cell day-empty"></td>`;
-      } else if (diaAtual > totalDias) {
-        html += `<td class="day-cell day-empty"></td>`;
-      } else {
-        const dataStr = `${anoAtual}-${pad2(mesAtual + 1)}-${pad2(diaAtual)}`;
-        const eventosDia = todosEventos.filter(e => e.data === dataStr);
-        const hasEvent = eventosDia.length > 0;
+    let dia = 1;
+    for (let linha = 0; linha < 6; linha++) {
+      const tr = document.createElement("tr");
+      for (let col = 1; col <= 7; col++) {
+        const td = document.createElement("td");
 
-        if (!hasEvent) {
-          html += `<td class="day-cell"><span class="day-number">${diaAtual}</span></td>`;
-        } else {
-          const label = eventosDia.map(e => e.titulo).join(" / ").replace(/"/g,"&quot;");
-          html += `<td class="day-cell day-has-event" onclick="mostrarEventosDoDia('${dataStr}')" title="${label}">
-            <span class="day-number">${diaAtual}</span>
-          `;
+        const posGlobal = linha * 7 + col;
+        const offset = (primeiroDiaSemana + 6) % 7;
 
-          if (eventosDia.length === 1) {
-            html += `<div class="event-bar" style="background:${eventosDia[0].cor};"></div>`;
-          } else {
-            const max = Math.min(eventosDia.length, 4);
-            html += `<div class="event-bar event-bar-multi">`;
-            for (let i = 0; i < max; i++) {
-              html += `<div class="event-dot" style="background:${eventosDia[i].cor};"></div>`;
-            }
-            html += `</div>`;
-          }
-
-          html += `</td>`;
+        if (posGlobal <= offset || dia > diasMes) {
+          td.textContent = "";
+          tr.appendChild(td);
+          continue;
         }
 
-        diaAtual++;
+        const dataStr = `${ano}-${pad2(mes + 1)}-${pad2(dia)}`;
+        const feriado = feriadosAno.find((f) => f.data === dataStr);
+        const eventosDia = eventosGlobal.filter((ev) => ev.data === dataStr);
+
+        const span = document.createElement("div");
+        span.className = "mini-day";
+        span.textContent = dia;
+
+        if (feriado) {
+          span.classList.add("mini-holiday");
+        }
+
+        if (eventosDia.length > 0) {
+          span.classList.add("mini-event");
+        }
+
+        td.appendChild(span);
+        tr.appendChild(td);
+        dia++;
       }
+      tbody.appendChild(tr);
+      if (dia > diasMes) break;
     }
-    html += `</tr>`;
-    semana++;
+
+    table.appendChild(tbody);
+    mini.appendChild(table);
+    annualGrid.appendChild(mini);
   }
-
-  html += `</tbody></table>`;
-  container.innerHTML = html;
-
-  atualizarDetalhesMensagem(
-    "Nenhuma data selecionada",
-    "Clique em um dia com cor para ver os eventos."
-  );
 }
 
+// --------- TROCA DE MODO (mensal / anual) ----------
+function atualizarVisao() {
+  const modo = viewModeSelect.value;
+
+  if (modo === "mensal") {
+    monthlyView.style.display = "block";
+    annualView.style.display = "none";
+    monthWrapper.style.display = "inline-flex";
+    prevMonthBtn.style.display = "inline-flex";
+    nextMonthBtn.style.display = "inline-flex";
+    renderMensal();
+  } else {
+    monthlyView.style.display = "none";
+    annualView.style.display = "block";
+    monthWrapper.style.display = "none";
+    prevMonthBtn.style.display = "none";
+    nextMonthBtn.style.display = "none";
+    renderAnual();
+  }
+}
+
+// --------- NAVEGAÇÃO MENSAL ----------
 function mudarMes(delta) {
   mesAtual += delta;
   if (mesAtual < 0) {
     mesAtual = 11;
     anoAtual--;
-    gerarFeriadosParaAno(anoAtual);
   } else if (mesAtual > 11) {
     mesAtual = 0;
     anoAtual++;
-    gerarFeriadosParaAno(anoAtual);
   }
-
-  const yearSel = document.getElementById("yearSelect");
-  const monthSel = document.getElementById("monthSelect");
-  if (yearSel) yearSel.value = anoAtual;
-  if (monthSel) monthSel.value = mesAtual;
-
-  renderizarCalendarioMensal();
+  yearSelect.value = anoAtual;
+  monthSelect.value = mesAtual;
+  atualizarVisao();
 }
 
-/* -------- VISÃO ANUAL (lista por mês) ---------- */
+// --------- EVENTOS DE UI ----------
+viewModeSelect.addEventListener("change", atualizarVisao);
 
-function renderizarCalendarioAnual() {
-  const container = document.getElementById("calendario");
-  if (!container) return;
+yearSelect.addEventListener("change", () => {
+  anoAtual = parseInt(yearSelect.value, 10);
+  atualizarVisao();
+});
 
-  const todosEventos = [...eventosGlobal, ...feriados];
-  let html = `<div class="view-title">Eventos de ${anoAtual}</div>`;
+monthSelect.addEventListener("change", () => {
+  mesAtual = parseInt(monthSelect.value, 10);
+  atualizarVisao();
+});
 
-  for (let m = 0; m < 12; m++) {
-    const mesStr = pad2(m + 1);
-    const eventosMes = todosEventos
-      .filter(e => e.data.startsWith(`${anoAtual}-${mesStr}`))
-      .sort((a,b) => a.data.localeCompare(b.data));
+prevMonthBtn.addEventListener("click", () => mudarMes(-1));
+nextMonthBtn.addEventListener("click", () => mudarMes(1));
 
-    html += `<div class="month-block">
-      <div class="month-name">${mesesNomes[m]}</div>
-    `;
+// --------- INICIALIZAÇÃO ----------
+(async function init() {
+  popularAnos();
+  popularMeses();
 
-    if (eventosMes.length === 0) {
-      html += `<div class="day-view-empty">Sem eventos neste mês.</div>`;
-    } else {
-      html += `<ul class="month-list">`;
-      eventosMes.forEach(ev => {
-        const dia = ev.data.split("-")[2];
-        html += `<li><strong>${dia}</strong> – ${ev.titulo}</li>`;
-      });
-      html += `</ul>`;
-    }
+  const hoje = new Date();
+  anoAtual = hoje.getFullYear();
+  mesAtual = hoje.getMonth();
 
-    html += `</div>`;
-  }
+  yearSelect.value = anoAtual;
+  monthSelect.value = mesAtual;
 
-  container.innerHTML = html;
-
-  atualizarDetalhesMensagem(
-    "Visão anual",
-    "Listagem de todos os eventos e feriados do ano."
-  );
-}
-
-/* -------- VISÃO SEMESTRAL ---------- */
-
-function renderizarCalendarioSemestral() {
-  const container = document.getElementById("calendario");
-  if (!container) return;
-
-  const todosEventos = [...eventosGlobal, ...feriados];
-  const inicio = (semestreAtual === 1) ? 0 : 6;
-  const fim = (semestreAtual === 1) ? 5 : 11;
-  const titulo = semestreAtual === 1 ? "1º Semestre" : "2º Semestre";
-
-  let html = `
-    <div class="semestre-header">
-      <span>${titulo} de ${anoAtual}</span>
-      <button class="semestre-btn" onclick="trocarSemestre()">Trocar semestre</button>
-    </div>
-  `;
-
-  for (let m = inicio; m <= fim; m++) {
-    const mesStr = pad2(m + 1);
-    const eventosMes = todosEventos
-      .filter(e => e.data.startsWith(`${anoAtual}-${mesStr}`))
-      .sort((a,b) => a.data.localeCompare(b.data));
-
-    html += `<div class="month-block">
-      <div class="month-name">${mesesNomes[m]}</div>
-    `;
-
-    if (eventosMes.length === 0) {
-      html += `<div class="day-view-empty">Sem eventos neste mês.</div>`;
-    } else {
-      html += `<ul class="month-list">`;
-      eventosMes.forEach(ev => {
-        const dia = ev.data.split("-")[2];
-        html += `<li><strong>${dia}</strong> – ${ev.titulo}</li>`;
-      });
-      html += `</ul>`;
-    }
-
-    html += `</div>`;
-  }
-
-  container.innerHTML = html;
-
-  atualizarDetalhesMensagem(
-    "Visão semestral",
-    "Eventos agrupados por mês dentro do semestre selecionado."
-  );
-}
-
-function trocarSemestre() {
-  semestreAtual = (semestreAtual === 1) ? 2 : 1;
-  renderizarCalendarioSemestral();
-}
-
-/* -------- VISÃO DIA ---------- */
-
-function renderizarDia() {
-  const container = document.getElementById("calendario");
-  const dateInput = document.getElementById("datePicker");
-  if (!container || !dateInput) return;
-
-  let dataStr = dateInput.value;
-  if (!dataStr) {
-    const hoje = new Date().toISOString().slice(0,10);
-    dataStr = hoje;
-    dateInput.value = hoje;
-  }
-
-  const todosEventos = [...eventosGlobal, ...feriados];
-  const eventosDia = todosEventos.filter(e => e.data === dataStr);
-
-  const [ano, mes, dia] = dataStr.split("-");
-  const dataFormatada = `${dia}/${mes}/${ano}`;
-  let html = `<div class="view-title">Eventos em ${dataFormatada}</div>`;
-
-  if (eventosDia.length === 0) {
-    html += `<div class="day-view-empty">Não há eventos cadastrados para esta data.</div>`;
-  } else {
-    html += `<ul class="month-list">`;
-    eventosDia.forEach(ev => {
-      html += `<li>${ev.titulo}</li>`;
-    });
-    html += `</ul>`;
-  }
-
-  container.innerHTML = html;
-  mostrarEventosDoDia(dataStr);
-}
-
-/* -------- EXPOSE PARA O HTML ---------- */
-
-window.alterarModo = alterarModo;
-window.mudarMes = mudarMes;
-window.trocarSemestre = trocarSemestre;
-window.renderizarDia = renderizarDia;
-window.alterarAno = alterarAno;
-window.alterarMesSelect = alterarMesSelect;
-
-document.addEventListener("DOMContentLoaded", inicializarCalendario);
+  await carregarEventos();
+  atualizarVisao();
+})();
