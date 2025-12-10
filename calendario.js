@@ -1,12 +1,15 @@
-// 🔗 URL do seu Realtime Database
-const URL = "https://agenda-areia-ana-default-rtdb.firebaseio.com/eventos.json";
+// URL do nó "eventos" no Realtime Database (REST API)
+const DB_URL = "https://agenda-areia-ana-default-rtdb.firebaseio.com/eventos.json";
 
-let eventosGlobal = [];   // eventos da empresa (Firebase)
-let feriados = [];        // feriados já calculados por ano
+// Eventos da empresa (vêm do Firebase)
+let eventosGlobal = [];
+// Feriados nacionais calculados por ano
+let feriados = [];
+
 let mesAtual;
 let anoAtual;
-let modoAtual = "mes";
-let semestreAtual = 1;
+let modoAtual = "mes";   // "mes", "ano", "semestre", "dia"
+let semestreAtual = 1;   // 1º ou 2º semestre
 
 const mesesNomes = [
   "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
@@ -17,8 +20,7 @@ function pad2(n) {
   return String(n).padStart(2, "0");
 }
 
-/* -------- FERIADOS FIXOS ---------- */
-
+/* -------- FERIADOS FIXOS (nacionais) ---------- */
 function gerarFeriadosParaAno(ano) {
   const fixos = [
     { mes: 1,  dia: 1,  titulo: "Confraternização Universal" },
@@ -39,28 +41,30 @@ function gerarFeriadosParaAno(ano) {
   }));
 }
 
-/* -------- INIT ---------- */
-
-async function inicializarCalendario() {
+/* -------- CARREGA EVENTOS DO FIREBASE ---------- */
+async function carregarEventosDoFirebase() {
   try {
-    const resp = await fetch(`${DB_URL}/eventos.json`);
+    const resp = await fetch(DB_URL);
     const dados = await resp.json();
-    if (dados) {
-      eventosGlobal = Object.values(dados);
-    } else {
-      eventosGlobal = [];
-    }
+    // se ainda não existe, fica []
+    eventosGlobal = Array.isArray(dados) ? dados : [];
   } catch (e) {
-    console.warn("Erro ao carregar eventos do Firebase:", e);
+    console.warn("Não foi possível carregar eventos do Firebase.", e);
     eventosGlobal = [];
   }
+}
+
+/* -------- INIT ---------- */
+async function inicializarCalendario() {
+  await carregarEventosDoFirebase();
 
   const hoje = new Date();
-  mesAtual = hoje.getMonth();
+  mesAtual = hoje.getMonth();        // 0..11
   anoAtual = hoje.getFullYear();
-  gerarFeriadosParaAno(anoAtual);
 
+  gerarFeriadosParaAno(anoAtual);
   preencherSelectsAnoMes();
+
   const dateInput = document.getElementById("datePicker");
   if (dateInput) {
     dateInput.value = hoje.toISOString().slice(0, 10);
@@ -126,6 +130,8 @@ function renderizarLegenda() {
   if (!legendaEl) return;
 
   const mapa = new Map();
+
+  // Um título por cor (pega o primeiro que encontrar)
   eventosGlobal.forEach(e => {
     if (!mapa.has(e.cor)) {
       mapa.set(e.cor, e.titulo);
@@ -138,7 +144,9 @@ function renderizarLegenda() {
 
   let html = `<div class="legend-title">Legenda de eventos</div>`;
   if (mapa.size === 0) {
-    html += `<div style="color:#c2c7ff;font-size:11px;">Sem eventos cadastrados.</div>`;
+    html += `<div style="color:#c2c7ff;font-size:11px;">
+               Sem eventos cadastrados ainda. Use a tela de administrador.
+             </div>`;
   } else {
     mapa.forEach((titulo, cor) => {
       html += `
@@ -217,7 +225,7 @@ function mostrarEventosDoDia(dataStr) {
   atualizarDetalhesMensagem(dataFormatada, html);
 }
 
-/* -------- CALENDÁRIO MENSAL ---------- */
+/* -------- CALENDÁRIO MENSAL – TABELA ---------- */
 
 function renderizarCalendarioMensal() {
   const container = document.getElementById("calendario");
@@ -226,7 +234,7 @@ function renderizarCalendarioMensal() {
   const primeiroDia = new Date(anoAtual, mesAtual, 1);
   const totalDias = new Date(anoAtual, mesAtual + 1, 0).getDate();
 
-  // getDay() 0=Dom ... 6=Sáb  -> converter para 0=Seg ... 6=Dom
+  // getDay() 0=Dom...6=Sáb -> ajusta para 0=Seg
   const jsDay = primeiroDia.getDay(); // 0..6
   let inicioSemana = (jsDay + 6) % 7; // 0=Seg
 
@@ -261,24 +269,24 @@ function renderizarCalendarioMensal() {
         html += `<td class="day-cell day-empty"></td>`;
       } else {
         const dataStr = `${anoAtual}-${pad2(mesAtual + 1)}-${pad2(diaAtual)}`;
-        const todosEventosDia = todosEventos.filter(e => e.data === dataStr);
-        const hasEvent = todosEventosDia.length > 0;
+        const eventosDia = todosEventos.filter(e => e.data === dataStr);
+        const hasEvent = eventosDia.length > 0;
 
         if (!hasEvent) {
           html += `<td class="day-cell"><span class="day-number">${diaAtual}</span></td>`;
         } else {
-          const label = todosEventosDia.map(e => e.titulo).join(" / ").replace(/"/g,"&quot;");
+          const label = eventosDia.map(e => e.titulo).join(" / ").replace(/"/g,"&quot;");
           html += `<td class="day-cell day-has-event" onclick="mostrarEventosDoDia('${dataStr}')" title="${label}">
             <span class="day-number">${diaAtual}</span>
           `;
 
-          if (todosEventosDia.length === 1) {
-            html += `<div class="event-bar" style="background:${todosEventosDia[0].cor};"></div>`;
+          if (eventosDia.length === 1) {
+            html += `<div class="event-bar" style="background:${eventosDia[0].cor};"></div>`;
           } else {
-            const max = Math.min(todosEventosDia.length, 4);
+            const max = Math.min(eventosDia.length, 4);
             html += `<div class="event-bar event-bar-multi">`;
             for (let i = 0; i < max; i++) {
-              html += `<div class="event-dot" style="background:${todosEventosDia[i].cor};"></div>`;
+              html += `<div class="event-dot" style="background:${eventosDia[i].cor};"></div>`;
             }
             html += `</div>`;
           }
@@ -322,7 +330,7 @@ function mudarMes(delta) {
   renderizarCalendarioMensal();
 }
 
-/* -------- VISÃO ANUAL ---------- */
+/* -------- VISÃO ANUAL (lista por mês) ---------- */
 
 function renderizarCalendarioAnual() {
   const container = document.getElementById("calendario");
@@ -453,7 +461,8 @@ function renderizarDia() {
   mostrarEventosDoDia(dataStr);
 }
 
-/* -------- EXPOSE ---------- */
+/* -------- EXPOSE PARA O HTML ---------- */
+
 window.alterarModo = alterarModo;
 window.mudarMes = mudarMes;
 window.trocarSemestre = trocarSemestre;
