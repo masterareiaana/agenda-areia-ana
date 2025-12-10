@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Calendário Corporativo</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap">
+  <style>
+    :root {
+      --bg: #050814;
+      --card: #0b1020;
+      --card-soft: #101629;
+      --accent: #ffb200;
+      --accent-strong: #ff7a1a;
+      --text: #f5f7ff;
+      --soft: #c2c7ff;
+      --holiday: #808080;
+    }
+
+    body {
+      font-family: Inter, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .wrapper {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 18px 20px 22px;
+      max-width: 780px;
+      width: 100%;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 0 0 4px;
+      text-align: center;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--soft);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: var(--soft);
+    }
+
+    .top-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    select,
+    input[type="date"] {
+      background: var(--card-soft);
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text);
+      padding: 4px 10px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    #datePicker {
+      display: none; /* aparece só no modo Dia */
+    }
+
+    .month-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .nav-btn {
+      background: var(--card-soft);
+      border: none;
+      color: var(--soft);
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 0;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* TABELA MENSAL */
+
+    .cal-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      background: var(--card-soft);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .cal-table thead {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .cal-table th,
+    .cal-table td {
+      padding: 4px 4px;
+      text-align: center;
+      border: 1px solid rgba(0,0,0,0.28);
+    }
+
+    .cal-table th {
+      font-weight: 600;
+    }
+
+    .week-col {
+      background: #f4c547;
+      color: #000;
+      font-weight: 600;
+      width: 50px;
+    }
+
+    .day-cell {
+      min-width: 24px;
+      height: 24px;
+      position: relative;
+      background: #1a2136;
+    }
+
+    .day-empty {
+      background: #0c1020;
+    }
+
+    .day-number {
+      font-size: 11px;
+    }
+
+    .day-has-event {
+      cursor: pointer;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16);
+    }
+
+    .day-has-event:hover {
+      background: #252f4a;
+    }
+
+    .event-bar {
+      position: absolute;
+      bottom: 2px;
+      left: 2px;
+      right: 2px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--accent-strong);
+    }
+
+    .event-bar-multi {
+      display: flex;
+      gap: 2px;
+      height: 4px;
+    }
+
+    .event-dot {
+      flex: 1;
+      border-radius: 999px;
+    }
+
+    /* DETALHES E LEGENDA */
+
+    .details {
+      margin-top: 10px;
+      padding: 10px;
+      background: var(--card-soft);
+      border-radius: 10px;
+      font-size: 11px;
+      min-height: 40px;
+    }
+
+    .details-title {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .event-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 1px;
+    }
+
+    .event-color {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .legend {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 11px;
+    }
+
+    .legend-title {
+      font-size: 12px;
+      color: var(--soft);
+      margin-bottom: 4px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .legend-color {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* VISÕES LISTA (ANO / SEMESTRE / DIA) */
+
+    .view-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .month-block {
+      margin-bottom: 6px;
+      padding: 6px 8px;
+      background: var(--card-soft);
+      border-radius: 8px;
+    }
+
+    .month-name {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .month-list {
+      padding-left: 14px;
+      margin: 0;
+      font-size: 11px;
+    }
+
+    .month-list li {
+      margin-bottom: 1px;
+    }
+
+    .semestre-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .semestre-btn {
+      background: var(--card-soft);
+      border: none;
+      color: var(--soft);
+      padding: 2px 8px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .semestre-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .day-view-empty {
+      font-size: 11px;
+      color: var(--soft);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <h1>Calendário Corporativo</h1>
+    <p class="subtitle">Visual anual / semestral / mensal / dia, com feriados em cinza.</p>
+
+    <div class="top-bar">
+      <div class="top-group">
+        <label for="viewMode">Visualizar:</label>
+        <select id="viewMode" onchange="alterarModo()">
+          <option value="mes">Mensal</option>
+          <option value="ano">Anual</option>
+          <option value="semestre">Semestral</option>
+          <option value="dia">Dia</option>
+        </select>
+      </div>
+
+      <div class="top-group">
+        <span>Ano:</span>
+        <select id="yearSelect" onchange="alterarAno()"></select>
+
+        <span id="monthLabelWrapper">
+          &nbsp;• Mês:
+          <select id="monthSelect" onchange="alterarMesSelect()"></select>
+        </span>
+
+        <input type="date" id="datePicker" onchange="renderizarDia()">
+      </div>
+    </div>
+
+    <div id="calendario"></div>
+
+    <div class="details" id="detalhes">
+      <div class="details-title">Nenhuma data selecionada</div>
+      <div style="color:#c2c7ff;">
+        No modo mensal clique em um dia com cor. No modo dia escolha uma data acima.
+      </div>
+    </div>
+
+    <div class="legend" id="legenda">
+      <div class="legend-title">Legenda de eventos</div>
+    </div>
+  </div>
+
+  <script src="calendario.js"></script>
+</body>
+</html>
