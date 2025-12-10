@@ -1,363 +1,358 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Calendário Corporativo – Agenda Areia Ana</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>Calendário Corporativo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
     :root {
       --bg: #050814;
-      --bg-card: #0b1020;
-      --bg-card-soft: #101629;
-      --accent: #ff7a1a;       /* Laranja do cabeçalho */
+      --card: #0b1020;
+      --card-soft: #101629;
+      --accent: #ff7a1a;
       --accent-soft: #ff9b4a;
       --text: #f5f7ff;
       --text-soft: #c2c7ff;
-      --border-soft: #151a2b;
-      --feriado: #4f4f4f;      /* Cinza mais escuro pro feriado */
+      --feriado: #555555; /* cinza mais escuro */
     }
 
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 0;
       background: radial-gradient(circle at top, #151821 0, #050814 45%, #02030a 100%);
       color: var(--text);
+      min-height: 100vh;
       display: flex;
       justify-content: center;
+      align-items: flex-start;
       padding: 24px;
     }
 
-    .wrapper {
+    .page {
       width: 100%;
-      max-width: 1280px;
-    }
-
-    .card {
-      background: linear-gradient(145deg, #060a17 0, #050814 40%, #050814 60%, #060a17 100%);
+      max-width: 1200px;
+      background: linear-gradient(145deg, #070b18 0, #050814 40%, #040614 100%);
       border-radius: 24px;
-      padding: 24px 24px 20px;
+      padding: 24px 28px 28px;
       box-shadow:
-        0 32px 80px rgba(0, 0, 0, 0.72),
+        0 22px 60px rgba(0, 0, 0, 0.85),
         0 0 0 1px rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.03);
     }
 
-    .card-header {
+    .page-header {
       display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
+      gap: 16px;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
     .title-block h1 {
-      font-size: 1.4rem;
-      margin: 0;
-      text-align: left;
+      font-size: 1.6rem;
+      font-weight: 700;
     }
 
     .title-block p {
-      margin: 4px 0 0;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: var(--text-soft);
     }
 
-    .controls {
+    .filters {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
       align-items: center;
       justify-content: flex-end;
     }
 
-    .controls label {
+    .filters label {
       font-size: 0.8rem;
       color: var(--text-soft);
       margin-right: 4px;
     }
 
-    .controls select {
-      background: #080d1a;
-      border: 1px solid var(--border-soft);
-      color: var(--text);
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      outline: none;
-    }
-
-    .controls select:focus {
-      border-color: var(--accent-soft);
-      box-shadow: 0 0 0 1px rgba(255, 122, 26, 0.35);
-    }
-
-    /* Navegação mês */
-    .month-nav {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 12px;
-      margin-top: 4px;
-    }
-
-    .month-nav button {
-      background: #080d1a;
-      border-radius: 999px;
-      border: 1px solid var(--border-soft);
-      color: var(--text-soft);
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 0;
-    }
-
-    .month-nav button:hover {
-      border-color: var(--accent-soft);
-      color: var(--accent-soft);
-    }
-
-    .month-nav span {
-      font-weight: 600;
-      letter-spacing: 0.02em;
-    }
-
-    /* Calendário mensal (principal) */
-    .calendar-table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #050814;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.02);
-    }
-
-    .calendar-table thead {
-      background: var(--accent);   /* laranja */
-      color: #1b1208;
-    }
-
-    .calendar-table th,
-    .calendar-table td {
-      padding: 8px;
-      text-align: center;
-      font-size: 0.8rem;
-      border-bottom: 1px solid var(--border-soft);
-      border-right: 1px solid var(--border-soft);
-    }
-
-    .calendar-table th:first-child,
-    .calendar-table td:first-child {
-      width: 60px;
-    }
-
-    .calendar-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .calendar-table td:last-child,
-    .calendar-table th:last-child {
-      border-right: none;
-    }
-
-    .calendar-table tbody tr:nth-child(odd) td:first-child {
-      background: #090f20;
-      font-weight: 600;
-      color: var(--text-soft);
-    }
-
-    .day-cell {
+    .select {
       position: relative;
-      height: 40px;
-      cursor: pointer;
-      transition: background 0.15s, box-shadow 0.15s, transform 0.05s;
-    }
-
-    .day-cell span.day-number {
-      position: absolute;
-      top: 6px;
-      left: 6px;
-      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      background: #060a18;
+      border-radius: 999px;
+      padding: 4px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.8rem;
       color: var(--text-soft);
+      gap: 6px;
     }
 
-    /* SEM fundo laranja, só contorno leve */
-    .day-cell.has-event {
-      background: #050814;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    .select select {
+      background: transparent;
+      border: none;
+      color: inherit;
+      font-size: inherit;
+      outline: none;
+      padding-right: 16px;
+      cursor: pointer;
     }
 
-    .day-cell.has-event:hover {
-      background: #080d1a;
+    .select::after {
+      content: "▾";
+      font-size: 0.7rem;
+      color: var(--text-soft);
+      pointer-events: none;
+    }
+
+    /* Container do calendário */
+    .calendar-card {
+      margin-top: 8px;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+
+    .month-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .month-title {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .nav-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: none;
+      background: #060a18;
+      color: var(--text-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.9rem;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+      transition: background 0.16s, transform 0.12s;
+    }
+
+    .nav-btn:hover {
+      background: #0d1224;
       transform: translateY(-1px);
     }
 
-    .day-cell:hover {
-      background: #070c1a;
+    .nav-btn:active {
+      transform: translateY(1px);
     }
 
-    .day-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      position: absolute;
-      bottom: 6px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--accent-soft);
+    /* Tabela mensal */
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #050816;
     }
 
-    .day-dot.feriado {
-      background: var(--feriado);
+    .table thead {
+      background: var(--accent);
+      color: #050814;
+    }
+
+    .table th,
+    .table td {
+      padding: 10px 4px;
+      text-align: center;
+      font-size: 0.8rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      border-right: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .table th:last-child,
+    .table td:last-child {
+      border-right: none;
+    }
+
+    .table thead th {
+      font-weight: 600;
+    }
+
+    .table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Célula do dia (MENSAL) */
+    .day-cell {
+      position: relative;
+      height: 54px;
+      background: #050816;
+      cursor: default;
+      transition: background 0.18s, box-shadow 0.18s, transform 0.1s;
     }
 
     .day-cell.empty {
-      background: #050814;
-      box-shadow: none;
+      background: #050816;
       cursor: default;
     }
 
-    .day-cell.empty:hover {
-      background: #050814;
-      transform: none;
+    .day-cell span.day-number {
+      position: relative;
+      font-size: 0.9rem;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
     }
 
-    /* Calendário anual: grade 6 x 2 */
+    .day-cell.has-info {
+      cursor: pointer;
+    }
+
+    .day-cell.has-info:hover {
+      background: #070b1b;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+
+    /* Linha colorida de evento / feriado (MENSAL) */
+    .day-line {
+      position: absolute;
+      bottom: 4px;
+      left: 8%;
+      width: 84%;
+      height: 3px;
+      border-radius: 3px;
+      background: var(--accent);
+    }
+
+    .day-line.feriado {
+      background: var(--feriado);
+    }
+
+    /* ANUAL */
     .year-grid {
-      margin-top: 8px;
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 6px;
     }
 
-    .mini-month {
-      background: #050814;
-      border-radius: 12px;
-      padding: 8px;
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.02);
+    .month-mini {
+      background: #050816;
+      border-radius: 14px;
+      padding: 10px;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03);
     }
 
-    .mini-month-title {
+    .month-mini h3 {
+      font-size: 0.85rem;
+      margin-bottom: 6px;
       text-align: center;
-      font-size: 0.8rem;
-      margin-bottom: 4px;
       color: var(--text-soft);
     }
 
     .mini-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.65rem;
-    }
-
-    .mini-table thead {
-      background: var(--accent);
-      color: #1b1208;
+      table-layout: fixed;
     }
 
     .mini-table th,
     .mini-table td {
+      padding: 4px 0;
       text-align: center;
-      padding: 3px;
-      border-bottom: 1px solid var(--border-soft);
-      border-right: 1px solid var(--border-soft);
+      font-size: 0.65rem;
+      color: var(--text-soft);
     }
 
-    .mini-table tr:last-child td {
-      border-bottom: none;
+    .mini-table thead {
+      background: var(--accent);
+      color: #050814;
     }
 
-    .mini-table th:last-child,
-    .mini-table td:last-child {
-      border-right: none;
+    .mini-table tbody td {
+      border-top: 1px solid rgba(255, 255, 255, 0.02);
+      position: relative;
+      height: 26px;
     }
 
     .mini-day {
       position: relative;
-      height: 22px;
-      cursor: pointer;
-      transition: background 0.15s, box-shadow 0.15s, transform 0.05s;
+      cursor: default;
     }
 
     .mini-day span {
-      font-size: 0.65rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      color: var(--text);
     }
 
-    /* >>> AQUI EU TROQUEI: sem fundo laranja no anual também <<< */
-    .mini-day.has-event {
-      background: #050814;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    .mini-day.has-info {
+      cursor: pointer;
     }
 
-    .mini-day:hover {
-      background: #070c1a;
-      transform: translateY(-1px);
+    .mini-day.has-info:hover {
+      background: #070b1b;
     }
 
-    .mini-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
+    .mini-line {
       position: absolute;
       bottom: 2px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--accent-soft);
+      left: 12%;
+      width: 76%;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--accent);
     }
 
-    .mini-dot.feriado {
+    .mini-line.feriado {
       background: var(--feriado);
-    }
-
-    /* Detalhes do dia clicado */
-    .event-details {
-      margin-top: 12px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: #080d1a;
-      border: 1px solid var(--border-soft);
-      font-size: 0.8rem;
-    }
-
-    .event-details strong {
-      color: var(--accent-soft);
-    }
-
-    .event-details ul {
-      margin: 6px 0 0;
-      padding-left: 18px;
-    }
-
-    .event-details li {
-      margin-bottom: 2px;
     }
 
     /* Legenda */
     .legend {
-      margin-top: 16px;
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #050816;
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      font-size: 0.8rem;
-      color: var(--text-soft);
       align-items: center;
-      justify-content: center;
-      text-align: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.04);
     }
 
     .legend-title {
       font-weight: 600;
-      color: var(--text);
+      margin-right: 6px;
+    }
+
+    .legend-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      align-items: center;
     }
 
     .legend-item {
@@ -367,320 +362,167 @@
     }
 
     .legend-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--accent);
     }
 
     .legend-dot.feriado {
       background: var(--feriado);
     }
 
-    .legend-dynamic {
-      display: inline-flex;
-      flex-wrap: wrap;
-      gap: 12px;
+    /* Modal de detalhes */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 5, 15, 0.82);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      background: #050816;
+      border-radius: 16px;
+      padding: 18px 20px 16px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow:
+        0 18px 50px rgba(0, 0, 0, 0.85),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .modal-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: none;
+      background: #080c1c;
+      color: var(--text-soft);
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
       justify-content: center;
     }
 
-    @media (max-width: 1024px) {
+    .modal-body {
+      font-size: 0.85rem;
+      color: var(--text-soft);
+    }
+
+    .event-list {
+      list-style: none;
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .event-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: #050a1a;
+    }
+
+    .event-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    @media (max-width: 900px) {
       .year-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
-    @media (max-width: 768px) {
-      .card {
-        padding: 18px 14px 14px;
+    @media (max-width: 640px) {
+      .page {
+        padding: 18px 14px 18px;
       }
 
-      .card-header {
+      .page-header {
+        flex-direction: column;
         align-items: flex-start;
       }
 
-      .year-grid {
-        grid-template-columns: repeat(2, 1fr);
+      .filters {
+        justify-content: flex-start;
       }
 
-      .calendar-table th,
-      .calendar-table td {
-        padding: 6px;
+      .month-header {
+        margin-bottom: 8px;
+      }
+
+      .table th,
+      .table td {
+        padding: 7px 2px;
+        font-size: 0.72rem;
       }
 
       .day-cell {
-        height: 36px;
-      }
-    }
-
-    @media (max-width: 520px) {
-      .year-grid {
-        grid-template-columns: repeat(1, 1fr);
-      }
-
-      .controls {
-        width: 100%;
-        justify-content: flex-start;
+        height: 46px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="wrapper">
-    <div class="card">
-      <div class="card-header">
-        <div class="title-block">
-          <h1>Calendário Corporativo</h1>
-          <p>Visão mensal ou anual, com feriados em cinza e eventos da empresa.</p>
+  <div class="page">
+    <div class="page-header">
+      <div class="title-block">
+        <h1>Calendário Corporativo</h1>
+        <p>Visão mensal ou anual, com feriados em cinza e eventos da empresa.</p>
+      </div>
+      <div class="filters">
+        <div class="select">
+          <label for="modo">Visualizar:</label>
+          <select id="modo">
+            <option value="mensal">Mensal</option>
+            <option value="anual">Anual</option>
+          </select>
         </div>
 
-        <div class="controls">
-          <div>
-            <label for="modoVisualizacao">Visualizar:</label>
-            <select id="modoVisualizacao">
-              <option value="mensal">Mensal</option>
-              <option value="anual">Anual</option>
-            </select>
-          </div>
-
-          <div id="selectMesWrapper">
-            <label for="selectMes">Mês:</label>
-            <select id="selectMes"></select>
-          </div>
-
-          <div>
-            <label for="selectAno">Ano:</label>
-            <select id="selectAno"></select>
-          </div>
+        <div class="select" id="filtro-mes-wrapper">
+          <label for="mes">Mês:</label>
+          <select id="mes"></select>
         </div>
-      </div>
 
-      <!-- Navegação do mês para a visão mensal -->
-      <div class="month-nav" id="monthNav">
-        <button id="btnPrev">&lt;</button>
-        <span id="labelMesAno"></span>
-        <button id="btnNext">&gt;</button>
-      </div>
-
-      <!-- Calendário mensal -->
-      <table class="calendar-table" id="tabelaMensal"></table>
-
-      <!-- Calendário anual -->
-      <div id="gradeAnual" style="display:none;">
-        <div class="year-grid" id="yearGrid"></div>
-      </div>
-
-      <!-- Detalhes do dia clicado -->
-      <div id="detalhesEvento" class="event-details" style="display:none;"></div>
-
-      <!-- Legenda -->
-      <div class="legend">
-        <span class="legend-title">Legenda de eventos</span>
-        <span class="legend-item">
-          <span class="legend-dot feriado"></span>Feriado nacional
-        </span>
-        <div id="legendEventos" class="legend-dynamic"></div>
+        <div class="select">
+          <label for="ano">Ano:</label>
+          <select id="ano"></select>
+        </div>
       </div>
     </div>
-  </div>
 
-  <script>
-    const URL_BASE = "https://agenda-areia-ana-default-rtdb.firebaseio.com/eventos.json";
-
-    const mesesNomes = [
-      "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-      "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
-    ];
-
-    const feriadosFixos = [
-      { mes: 1,  dia: 1,  titulo: "Confraternização Universal" },
-      { mes: 4,  dia: 21, titulo: "Tiradentes" },
-      { mes: 5,  dia: 1,  titulo: "Dia do Trabalhador" },
-      { mes: 9,  dia: 7,  titulo: "Independência do Brasil" },
-      { mes: 10, dia: 12, titulo: "Nossa Senhora Aparecida" },
-      { mes: 11, dia: 2,  titulo: "Finados" },
-      { mes: 11, dia: 15, titulo: "Proclamação da República" },
-      { mes: 12, dia: 25, titulo: "Natal" }
-    ];
-
-    const selectModo = document.getElementById("modoVisualizacao");
-    const selectMes = document.getElementById("selectMes");
-    const selectAno = document.getElementById("selectAno");
-    const tabelaMensal = document.getElementById("tabelaMensal");
-    const gradeAnual = document.getElementById("gradeAnual");
-    const yearGrid = document.getElementById("yearGrid");
-    const monthNav = document.getElementById("monthNav");
-    const labelMesAno = document.getElementById("labelMesAno");
-    const btnPrev = document.getElementById("btnPrev");
-    const btnNext = document.getElementById("btnNext");
-    const selectMesWrapper = document.getElementById("selectMesWrapper");
-    const detalhesEvento = document.getElementById("detalhesEvento");
-    const legendEventos = document.getElementById("legendEventos");
-
-    let anoAtual = new Date().getFullYear();
-    let mesAtual = new Date().getMonth();
-    let eventosCarregados = {};
-
-    let ultimoMapaAno = null;
-    let ultimoAnoMapa = null;
-
-    function popularSelects() {
-      selectMes.innerHTML = "";
-      mesesNomes.forEach((nome, idx) => {
-        const opt = document.createElement("option");
-        opt.value = idx;
-        opt.textContent = nome;
-        selectMes.appendChild(opt);
-      });
-      selectMes.value = mesAtual;
-
-      selectAno.innerHTML = "";
-      const anoBase = new Date().getFullYear();
-      for (let a = anoBase - 2; a <= anoBase + 3; a++) {
-        const opt = document.createElement("option");
-        opt.value = a;
-        opt.textContent = a;
-        selectAno.appendChild(opt);
-      }
-      selectAno.value = anoAtual;
-    }
-
-    async function carregarEventos() {
-      try {
-        const resp = await fetch(URL_BASE);
-        if (!resp.ok) return;
-        const dados = await resp.json() || {};
-        eventosCarregados = dados;
-      } catch (e) {
-        console.error("Erro ao carregar eventos do Firebase:", e);
-        eventosCarregados = {};
-      }
-      atualizarLegendaEventos();
-    }
-
-    function atualizarLegendaEventos() {
-      legendEventos.innerHTML = "";
-      if (!eventosCarregados) return;
-
-      const mapa = {};
-      Object.values(eventosCarregados).forEach(ev => {
-        if (!ev || !ev.titulo) return;
-        const cor = ev.cor || "#ff7a1a";
-        if (!mapa[ev.titulo]) {
-          mapa[ev.titulo] = cor;
-        }
-      });
-
-      Object.entries(mapa).forEach(([titulo, cor]) => {
-        const span = document.createElement("span");
-        span.className = "legend-item";
-        span.innerHTML = `<span class="legend-dot" style="background:${cor};"></span>${titulo}`;
-        legendEventos.appendChild(span);
-      });
-    }
-
-    function montarMapaEventos(ano) {
-      const mapa = {};
-
-      feriadosFixos.forEach(f => {
-        const dataStr = `${ano}-${String(f.mes).padStart(2,"0")}-${String(f.dia).padStart(2,"0")}`;
-        if (!mapa[dataStr]) mapa[dataStr] = [];
-        mapa[dataStr].push({
-          titulo: f.titulo,
-          cor: null,
-          feriado: true
-        });
-      });
-
-      if (eventosCarregados) {
-        Object.values(eventosCarregados).forEach(ev => {
-          if (!ev || !ev.data) return;
-          const baseDate = new Date(ev.data);
-          if (isNaN(baseDate)) return;
-
-          const tipo = ev.tipoRecorrencia || "unico";
-          const titulo = ev.titulo || "Evento";
-          const cor = ev.cor || "#ff7a1a";
-
-          function adiciona(dateObj) {
-            const y = dateObj.getFullYear();
-            const m = dateObj.getMonth() + 1;
-            const d = dateObj.getDate();
-            if (y !== ano) return;
-            const dataStr = `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-            if (!mapa[dataStr]) mapa[dataStr] = [];
-            mapa[dataStr].push({ titulo, cor, feriado: false });
-          }
-
-          if (tipo === "unico") {
-            if (baseDate.getFullYear() === ano) {
-              adiciona(baseDate);
-            }
-          } else if (tipo === "anual") {
-            const d = baseDate.getDate();
-            const m = baseDate.getMonth();
-            adiciona(new Date(ano, m, d));
-          } else if (tipo === "mensal") {
-            const diaMes = baseDate.getDate();
-            for (let m = 0; m < 12; m++) {
-              const dt = new Date(ano, m, diaMes);
-              adiciona(dt);
-            }
-          } else if (tipo === "semanal") {
-            let dt = new Date(baseDate);
-            while (dt.getFullYear() <= ano + 1) {
-              if (dt.getFullYear() === ano) adiciona(dt);
-              dt.setDate(dt.getDate() + 7);
-              if (dt.getFullYear() > ano) break;
-            }
-          } else {
-            if (baseDate.getFullYear() === ano) adiciona(baseDate);
-          }
-        });
-      }
-
-      return mapa;
-    }
-
-    function mostrarDetalhes(dataStr) {
-      const [y, m, d] = dataStr.split("-");
-      const ano = parseInt(y, 10);
-
-      if (ultimoAnoMapa !== ano || !ultimoMapaAno) {
-        ultimoMapaAno = montarMapaEventos(ano);
-        ultimoAnoMapa = ano;
-      }
-
-      const eventosDia = ultimoMapaAno[dataStr] || [];
-      if (!eventosDia.length) {
-        detalhesEvento.style.display = "none";
-        return;
-      }
-
-      const dataFormatada = `${d.padStart(2,"0")}/${m.padStart(2,"0")}/${y}`;
-      let html = `<strong>Eventos em ${dataFormatada}</strong><ul>`;
-      eventosDia.forEach(ev => {
-        const cor = ev.cor || (ev.feriado ? "#777" : "#ff7a1a");
-        const corDot = ev.feriado ? "var(--feriado)" : cor;
-        const titulo = ev.titulo || (ev.feriado ? "Feriado" : "Evento");
-        html += `<li><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${corDot};margin-right:6px;"></span>${titulo}</li>`;
-      });
-      html += "</ul>";
-
-      detalhesEvento.innerHTML = html;
-      detalhesEvento.style.display = "block";
-    }
-
-    function desenharMensal(ano, mes) {
-      const mapaEventos = montarMapaEventos(ano);
-      ultimoMapaAno = mapaEventos;
-      ultimoAnoMapa = ano;
-
-      labelMesAno.textContent = `${mesesNomes[mes]} ${ano}`;
-      selectAno.value = ano;
-      selectMes.value = mes;
-
-      let html = `
+    <div class="calendar-card" id="calendar-mensal">
+      <div class="month-header">
+        <button class="nav-btn" id="prev-month">&lt;</button>
+        <div class="month-title" id="month-title"></div>
+        <button class="nav-btn" id="next-month">&gt;</button>
+      </div>
+      <table class="table">
         <thead>
           <tr>
             <th>Semana</th>
@@ -693,196 +535,496 @@
             <th>Dom</th>
           </tr>
         </thead>
-        <tbody>
-      `;
+        <tbody id="tbody-mensal"></tbody>
+      </table>
+    </div>
 
-      const primeiroDiaMes = new Date(ano, mes, 1);
-      const diaSemana = (primeiroDiaMes.getDay() + 6) % 7;
-      const inicioGrade = new Date(ano, mes, 1 - diaSemana);
+    <div class="calendar-card" id="calendar-anual" style="display:none;">
+      <div class="month-header">
+        <div class="month-title" id="year-title"></div>
+      </div>
+      <div class="year-grid" id="year-grid"></div>
+    </div>
 
-      let dataCursor = new Date(inicioGrade);
-      let semana = 1;
+    <!-- Legenda -->
+    <div class="legend">
+      <span class="legend-title">Legenda de eventos</span>
+      <div class="legend-items">
+        <div class="legend-item">
+          <span class="legend-dot feriado"></span>
+          <span>Feriado nacional</span>
+        </div>
+        <div id="legend-dynamic"></div>
+      </div>
+    </div>
+  </div>
 
-      for (let linha = 0; linha < 6; linha++) {
-        html += `<tr><td>${semana}</td>`;
-        semana++;
+  <!-- Modal -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title"></div>
+        <button class="modal-close" id="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="modal-empty" style="display:none;">Nenhum evento cadastrado para esta data.</div>
+        <ul class="event-list" id="modal-list"></ul>
+      </div>
+    </div>
+  </div>
 
-        for (let col = 0; col < 7; col++) {
-          const y = dataCursor.getFullYear();
-          const m = dataCursor.getMonth();
-          const d = dataCursor.getDate();
-          const dataStr = `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+  <script>
+    // ====== CONFIG FIREBASE ======
+    const URL_EVENTOS =
+      "https://agenda-areia-ana-default-rtdb.firebaseio.com/eventos.json";
 
-          const eventosDia = mapaEventos[dataStr] || [];
-          const dentroMes = (m === mes);
+    const mesesNomes = [
+      "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+      "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ];
 
-          if (!dentroMes) {
-            html += `<td class="day-cell empty"></td>`;
-          } else {
-            const temEvento = eventosDia.length > 0;
-            let classes = "day-cell";
-            if (temEvento) classes += " has-event";
+    let anoAtual = new Date().getFullYear();
+    let mesAtual = new Date().getMonth();
+    let modo = "mensal";
 
-            html += `<td class="${classes}" data-date="${dataStr}">`;
-            html += `<span class="day-number">${d}</span>`;
+    let eventos = [];           // lista completa
+    let eventosPorData = {};    // índice por data YYYY-MM-DD
+    let feriadosPorData = {};   // índice por data de feriados
 
-            if (temEvento) {
-              const temFeriado = eventosDia.some(e => e.feriado);
-              html += `<div class="day-dot ${temFeriado ? "feriado" : ""}"></div>`;
-            }
+    const modoSelect = document.getElementById("modo");
+    const mesSelect = document.getElementById("mes");
+    const anoSelect = document.getElementById("ano");
+    const mesWrapper = document.getElementById("filtro-mes-wrapper");
 
-            html += `</td>`;
-          }
+    const monthTitle = document.getElementById("month-title");
+    const yearTitle = document.getElementById("year-title");
+    const tbodyMensal = document.getElementById("tbody-mensal");
+    const yearGrid = document.getElementById("year-grid");
 
-          dataCursor.setDate(dataCursor.getDate() + 1);
-        }
+    const calendarMensal = document.getElementById("calendar-mensal");
+    const calendarAnual = document.getElementById("calendar-anual");
 
-        html += `</tr>`;
-      }
+    const legendDynamic = document.getElementById("legend-dynamic");
 
-      html += `</tbody>`;
-      tabelaMensal.innerHTML = html;
+    const prevMonthBtn = document.getElementById("prev-month");
+    const nextMonthBtn = document.getElementById("next-month");
+
+    const modalBackdrop = document.getElementById("modal-backdrop");
+    const modalClose = document.getElementById("modal-close");
+    const modalTitle = document.getElementById("modal-title");
+    const modalList = document.getElementById("modal-list");
+    const modalEmpty = document.getElementById("modal-empty");
+
+    // ====== FERIADOS FIXOS (BRASIL) ======
+    function gerarFeriados(ano) {
+      const feriadosFixos = [
+        { mes: 0,  dia: 1,  titulo: "Confraternização Universal" },
+        { mes: 3,  dia: 21, titulo: "Tiradentes" },
+        { mes: 4,  dia: 1,  titulo: "Dia do Trabalhador" },
+        { mes: 8,  dia: 7,  titulo: "Independência do Brasil" },
+        { mes: 10, dia: 2,  titulo: "Finados" },
+        { mes: 10, dia: 15, titulo: "Proclamação da República" },
+        { mes: 11, dia: 25, titulo: "Natal" }
+      ];
+
+      const mapa = {};
+      feriadosFixos.forEach(f => {
+        const dataIso = formatarISO(ano, f.mes, f.dia);
+        mapa[dataIso] = {
+          data: dataIso,
+          titulo: f.titulo,
+          cor: "var(--feriado)",
+          feriado: true
+        };
+      });
+      return mapa;
     }
 
-    function desenharAnual(ano) {
-      const mapaEventos = montarMapaEventos(ano);
-      ultimoMapaAno = mapaEventos;
-      ultimoAnoMapa = ano;
+    function formatarISO(ano, mes, dia) {
+      const mm = String(mes + 1).padStart(2, "0");
+      const dd = String(dia).padStart(2, "0");
+      return `${ano}-${mm}-${dd}`;
+    }
 
-      yearGrid.innerHTML = "";
+    // ====== EVENTOS (FIREBASE) ======
+    async function carregarEventos() {
+      try {
+        const resp = await fetch(URL_EVENTOS);
+        const data = await resp.json();
+        eventos = [];
+        if (data) {
+          Object.keys(data).forEach(id => {
+            const e = data[id];
+            if (!e || !e.data) return;
+            eventos.push({
+              id,
+              data: e.data,
+              titulo: e.titulo || "Evento",
+              cor: e.cor || "#ff7a1a"
+            });
+          });
+        }
+      } catch (err) {
+        console.error("Erro ao carregar eventos:", err);
+      }
 
-      for (let mes = 0; mes < 12; mes++) {
-        const mini = document.createElement("div");
-        mini.className = "mini-month";
+      indexarEventos();
+      atualizarLegenda();
+      renderizar();
+    }
 
-        const titulo = document.createElement("div");
-        titulo.className = "mini-month-title";
-        titulo.textContent = mesesNomes[mes];
-        mini.appendChild(titulo);
+    function indexarEventos() {
+      eventosPorData = {};
+      eventos.forEach(e => {
+        if (!eventosPorData[e.data]) eventosPorData[e.data] = [];
+        eventosPorData[e.data].push(e);
+      });
+    }
 
-        let html = `
-          <table class="mini-table">
-            <thead>
-              <tr>
-                <th>S</th>
-                <th>T</th>
-                <th>Q</th>
-                <th>Q</th>
-                <th>S</th>
-                <th>S</th>
-                <th>D</th>
-              </tr>
-            </thead>
-            <tbody>
+    function atualizarLegenda() {
+      legendDynamic.innerHTML = "";
+
+      // pegar títulos únicos por cor
+      const mapa = {};
+      eventos.forEach(e => {
+        const chave = `${e.titulo}__${e.cor}`;
+        if (!mapa[chave]) {
+          mapa[chave] = { titulo: e.titulo, cor: e.cor };
+        }
+      });
+
+      Object.values(mapa).forEach(item => {
+        const div = document.createElement("div");
+        div.className = "legend-item";
+        div.innerHTML = `
+          <span class="legend-dot" style="background:${item.cor};"></span>
+          <span>${item.titulo}</span>
         `;
+        legendDynamic.appendChild(div);
+      });
+    }
 
-        const primeiroDiaMes = new Date(ano, mes, 1);
-        const diaSemana = (primeiroDiaMes.getDay() + 6) % 7;
-        const inicioGrade = new Date(ano, mes, 1 - diaSemana);
-        let cursor = new Date(inicioGrade);
+    // ====== RENDERIZAÇÃO ======
+    function renderizarMensal() {
+      feriadosPorData = gerarFeriados(anoAtual);
 
-        for (let linha = 0; linha < 6; linha++) {
-          html += `<tr>`;
-          for (let col = 0; col < 7; col++) {
-            const y = cursor.getFullYear();
-            const m = cursor.getMonth();
-            const d = cursor.getDate();
-            const dataStr = `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+      monthTitle.textContent = `${mesesNomes[mesAtual]} ${anoAtual}`;
+      tbodyMensal.innerHTML = "";
 
-            const eventosDia = mapaEventos[dataStr] || [];
-            const dentroMes = (m === mes);
+      const primeiroDiaSemana = new Date(anoAtual, mesAtual, 1).getDay(); // 0 = dom
+      const qtdeDiasMes = new Date(anoAtual, mesAtual + 1, 0).getDate();
 
-            if (!dentroMes) {
-              html += `<td></td>`;
-            } else {
-              const temEvento = eventosDia.length > 0;
-              let classes = "mini-day";
-              if (temEvento) classes += " has-event";
+      // Começar na segunda (seg = 1, dom = 0/7)
+      let offset = primeiroDiaSemana === 0 ? 6 : primeiroDiaSemana - 1;
 
-              html += `<td class="${classes}" data-date="${dataStr}"><span>${d}</span>`;
-              if (temEvento) {
-                const temFeriado = eventosDia.some(e => e.feriado);
-                html += `<div class="mini-dot ${temFeriado ? "feriado" : ""}"></div>`;
-              }
-              html += `</td>`;
-            }
+      let dia = 1;
+      let semana = 1;
 
-            cursor.setDate(cursor.getDate() + 1);
+      while (dia <= qtdeDiasMes) {
+        const tr = document.createElement("tr");
+
+        // coluna "Semana"
+        const tdSemana = document.createElement("td");
+        tdSemana.textContent = semana;
+        tdSemana.style.background = "var(--accent)";
+        tdSemana.style.color = "#050814";
+        tdSemana.style.fontWeight = "600";
+        tr.appendChild(tdSemana);
+
+        for (let i = 0; i < 7; i++) {
+          const td = document.createElement("td");
+          td.classList.add("day-cell");
+
+          if (offset > 0) {
+            td.classList.add("empty");
+            tr.appendChild(td);
+            offset--;
+            continue;
           }
-          html += `</tr>`;
+
+          if (dia > qtdeDiasMes) {
+            td.classList.add("empty");
+            tr.appendChild(td);
+            continue;
+          }
+
+          const dataIso = formatarISO(anoAtual, mesAtual, dia);
+
+          const span = document.createElement("span");
+          span.classList.add("day-number");
+          span.textContent = dia;
+          td.appendChild(span);
+
+          const eventosDia = eventosPorData[dataIso] || [];
+          const feriado = feriadosPorData[dataIso];
+
+          let corLinha = null;
+          let temInfo = false;
+
+          if (feriado) {
+            corLinha = "var(--feriado)";
+            temInfo = true;
+          } else if (eventosDia.length > 0) {
+            corLinha = eventosDia[0].cor || "var(--accent)";
+            temInfo = true;
+          }
+
+          if (corLinha) {
+            const line = document.createElement("div");
+            line.classList.add("day-line");
+            if (feriado) line.classList.add("feriado");
+            line.style.background = corLinha;
+            td.appendChild(line);
+          }
+
+          if (temInfo) {
+            td.classList.add("has-info");
+            td.dataset.date = dataIso;
+            td.addEventListener("click", () => abrirModal(dataIso));
+          }
+
+          tr.appendChild(td);
+          dia++;
         }
 
-        html += `</tbody></table>`;
-        mini.innerHTML += html;
+        tbodyMensal.appendChild(tr);
+        semana++;
+      }
+    }
+
+    function renderizarAnual() {
+      feriadosPorData = gerarFeriados(anoAtual);
+      yearTitle.textContent = `${anoAtual}`;
+      yearGrid.innerHTML = "";
+
+      for (let m = 0; m < 12; m++) {
+        const mini = document.createElement("div");
+        mini.className = "month-mini";
+
+        const h3 = document.createElement("h3");
+        h3.textContent = mesesNomes[m];
+        mini.appendChild(h3);
+
+        const table = document.createElement("table");
+        table.className = "mini-table";
+
+        const thead = document.createElement("thead");
+        const trh = document.createElement("tr");
+        ["S", "T", "Q", "Q", "S", "S", "D"].forEach(d => {
+          const th = document.createElement("th");
+          th.textContent = d;
+          trh.appendChild(th);
+        });
+        thead.appendChild(trh);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+
+        const primeiroDiaSemana = new Date(anoAtual, m, 1).getDay();
+        const qtdeDiasMes = new Date(anoAtual, m + 1, 0).getDate();
+
+        let offset = primeiroDiaSemana === 0 ? 6 : primeiroDiaSemana - 1;
+        let dia = 1;
+
+        while (dia <= qtdeDiasMes) {
+          const tr = document.createElement("tr");
+
+          for (let i = 0; i < 7; i++) {
+            const td = document.createElement("td");
+
+            if (offset > 0) {
+              offset--;
+              tr.appendChild(td);
+              continue;
+            }
+
+            if (dia > qtdeDiasMes) {
+              tr.appendChild(td);
+              continue;
+            }
+
+            const dataIso = formatarISO(anoAtual, m, dia);
+            const span = document.createElement("span");
+            span.textContent = dia;
+
+            const eventosDia = eventosPorData[dataIso] || [];
+            const feriado = feriadosPorData[dataIso];
+
+            let corLinha = null;
+            let temInfo = false;
+
+            if (feriado) {
+              corLinha = "var(--feriado)";
+              temInfo = true;
+            } else if (eventosDia.length > 0) {
+              corLinha = eventosDia[0].cor || "var(--accent)";
+              temInfo = true;
+            }
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "mini-day";
+            wrapper.appendChild(span);
+
+            if (corLinha) {
+              const line = document.createElement("div");
+              line.className = "mini-line";
+              if (feriado) line.classList.add("feriado");
+              line.style.background = corLinha;
+              wrapper.appendChild(line);
+            }
+
+            if (temInfo) {
+              wrapper.classList.add("has-info");
+              wrapper.dataset.date = dataIso;
+              wrapper.addEventListener("click", () => abrirModal(dataIso));
+            }
+
+            td.appendChild(wrapper);
+            tr.appendChild(td);
+            dia++;
+          }
+
+          tbody.appendChild(tr);
+        }
+
+        table.appendChild(tbody);
+        mini.appendChild(table);
         yearGrid.appendChild(mini);
       }
     }
 
-    function atualizarVisualizacao() {
-      const modo = selectModo.value;
-      anoAtual = parseInt(selectAno.value, 10);
-      mesAtual = parseInt(selectMes.value, 10);
-      detalhesEvento.style.display = "none";
-
+    function renderizar() {
       if (modo === "mensal") {
-        gradeAnual.style.display = "none";
-        tabelaMensal.style.display = "";
-        monthNav.style.display = "flex";
-        selectMesWrapper.style.display = "inline-block";
-        desenharMensal(anoAtual, mesAtual);
+        calendarMensal.style.display = "";
+        calendarAnual.style.display = "none";
+        renderizarMensal();
       } else {
-        tabelaMensal.style.display = "none";
-        gradeAnual.style.display = "block";
-        monthNav.style.display = "none";
-        selectMesWrapper.style.display = "none";
-        desenharAnual(anoAtual);
+        calendarMensal.style.display = "none";
+        calendarAnual.style.display = "";
+        renderizarAnual();
       }
     }
 
-    selectModo.addEventListener("change", atualizarVisualizacao);
-    selectMes.addEventListener("change", () => {
-      mesAtual = parseInt(selectMes.value, 10);
-      atualizarVisualizacao();
-    });
-    selectAno.addEventListener("change", () => {
-      anoAtual = parseInt(selectAno.value, 10);
-      atualizarVisualizacao();
+    // ====== MODAL ======
+    function abrirModal(dataIso) {
+      const eventosDia = eventosPorData[dataIso] || [];
+      const feriado = feriadosPorData[dataIso];
+
+      modalList.innerHTML = "";
+
+      const [ano, mes, dia] = dataIso.split("-");
+      modalTitle.textContent = `Eventos em ${dia}/${mes}/${ano}`;
+
+      const listaItens = [];
+
+      if (feriado) {
+        listaItens.push({
+          titulo: feriado.titulo,
+          cor: "var(--feriado)"
+        });
+      }
+
+      eventosDia.forEach(e => {
+        listaItens.push({
+          titulo: e.titulo,
+          cor: e.cor || "var(--accent)"
+        });
+      });
+
+      if (listaItens.length === 0) {
+        modalEmpty.style.display = "";
+        modalList.style.display = "none";
+      } else {
+        modalEmpty.style.display = "none";
+        modalList.style.display = "";
+        listaItens.forEach(item => {
+          const li = document.createElement("li");
+          li.className = "event-item";
+          li.innerHTML = `
+            <span class="event-color" style="background:${item.cor};"></span>
+            <span>${item.titulo}</span>
+          `;
+          modalList.appendChild(li);
+        });
+      }
+
+      modalBackdrop.classList.add("show");
+    }
+
+    function fecharModal() {
+      modalBackdrop.classList.remove("show");
+    }
+
+    // ====== CONTROLES ======
+    modoSelect.addEventListener("change", () => {
+      modo = modoSelect.value;
+      mesWrapper.style.display = modo === "mensal" ? "inline-flex" : "none";
+      renderizar();
     });
 
-    btnPrev.addEventListener("click", () => {
+    prevMonthBtn.addEventListener("click", () => {
       mesAtual--;
       if (mesAtual < 0) {
         mesAtual = 11;
         anoAtual--;
+        anoSelect.value = anoAtual;
       }
-      atualizarVisualizacao();
+      mesSelect.value = mesAtual;
+      renderizar();
     });
 
-    btnNext.addEventListener("click", () => {
+    nextMonthBtn.addEventListener("click", () => {
       mesAtual++;
       if (mesAtual > 11) {
         mesAtual = 0;
         anoAtual++;
+        anoSelect.value = anoAtual;
       }
-      atualizarVisualizacao();
+      mesSelect.value = mesAtual;
+      renderizar();
     });
 
-    function handleClickData(e) {
-      const cell = e.target.closest("td[data-date]");
-      if (!cell) return;
-      const dataStr = cell.dataset.date;
-      mostrarDetalhes(dataStr);
+    mesSelect.addEventListener("change", () => {
+      mesAtual = Number(mesSelect.value);
+      renderizar();
+    });
+
+    anoSelect.addEventListener("change", () => {
+      anoAtual = Number(anoSelect.value);
+      renderizar();
+    });
+
+    modalClose.addEventListener("click", fecharModal);
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) fecharModal();
+    });
+
+    // ====== INICIALIZAÇÃO ======
+    function preencherSelects() {
+      // anos
+      const anoBase = new Date().getFullYear();
+      for (let a = anoBase - 2; a <= anoBase + 5; a++) {
+        const opt = document.createElement("option");
+        opt.value = a;
+        opt.textContent = a;
+        anoSelect.appendChild(opt);
+      }
+      anoSelect.value = anoAtual;
+
+      // meses
+      mesesNomes.forEach((nome, idx) => {
+        const opt = document.createElement("option");
+        opt.value = idx;
+        opt.textContent = nome;
+        mesSelect.appendChild(opt);
+      });
+      mesSelect.value = mesAtual;
     }
 
-    tabelaMensal.addEventListener("click", handleClickData);
-    yearGrid.addEventListener("click", handleClickData);
-
     (async function init() {
-      popularSelects();
+      preencherSelects();
       await carregarEventos();
-      atualizarVisualizacao();
     })();
   </script>
 </body>
 </html>
-V
