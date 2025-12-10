@@ -1,5 +1,5 @@
 // 🔗 URL do seu Realtime Database
-const DB_URL = "https://agenda-areia-ana-default-rtdb.firebaseio.com";
+const URL = "https://agenda-areia-ana-default-rtdb.firebaseio.com/eventos.json";
 
 let eventosGlobal = [];   // eventos da empresa (Firebase)
 let feriados = [];        // feriados já calculados por ano
