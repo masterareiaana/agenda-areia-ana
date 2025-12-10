@@ -14,8 +14,8 @@
       --accent-soft: #ff9b4a;
       --text: #f5f7ff;
       --text-soft: #c2c7ff;
-      --danger: #ff4c4c;
-      --border: rgba(255, 255, 255, 0.08);
+      --border-soft: #1a2035;
+      --danger: #ff4b4b;
     }
 
     * {
@@ -25,519 +25,778 @@
     }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
       background: radial-gradient(circle at top, #151821 0, #050814 45%, #02030a 100%);
       color: var(--text);
-      min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: flex-start;
       padding: 32px 16px;
     }
 
-    .wrapper {
+    .container {
       width: 100%;
-      max-width: 900px;
-      background: linear-gradient(145deg, #060a18, #02030a);
-      border-radius: 24px;
-      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
-      padding: 32px 28px 28px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      max-width: 960px;
+      background: linear-gradient(145deg, #070b18, #050814);
+      border-radius: 20px;
+      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.8);
+      padding: 32px 24px 40px;
+      border: 1px solid #161d33;
     }
 
-    .header {
+    .title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 4px;
       text-align: center;
-      margin-bottom: 24px;
     }
 
-    .header h1 {
-      font-size: 24px;
-      margin-bottom: 6px;
-    }
-
-    .header p {
-      font-size: 13px;
+    .subtitle {
+      text-align: center;
+      font-size: 0.95rem;
       color: var(--text-soft);
+      margin-bottom: 24px;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px 20px;
-      margin-top: 20px;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 24px;
+      align-items: flex-start;
     }
 
-    @media (max-width: 720px) {
+    @media (max-width: 840px) {
       .grid {
         grid-template-columns: 1fr;
       }
     }
 
-    label {
+    .card {
+      background: radial-gradient(circle at top left, #171e3a 0, #0b1020 55%, #070b15 100%);
+      border-radius: 16px;
+      padding: 20px 18px;
+      border: 1px solid rgba(97, 108, 167, 0.4);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
       display: block;
-      font-size: 13px;
-      margin-bottom: 4px;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
       color: var(--text-soft);
     }
 
-    input[type="password"],
-    input[type="text"],
-    input[type="date"],
-    select {
+    .input,
+    .textarea,
+    .select {
       width: 100%;
-      background: #050814;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+      padding: 10px 12px;
+      background: #050918;
       color: var(--text);
-      font-size: 14px;
+      font-size: 0.9rem;
       outline: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      transition: border 0.15s, box-shadow 0.15s, background 0.15s;
     }
 
-    input[type="password"]:focus,
-    input[type="text"]:focus,
-    input[type="date"]:focus,
-    select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(255, 122, 26, 0.5);
+    .input::placeholder,
+    .textarea::placeholder {
+      color: #6c769c;
     }
 
-    input[type="color"] {
-      width: 100%;
-      height: 40px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: #050814;
-      padding: 2px 8px;
-      cursor: pointer;
+    .input:focus,
+    .textarea:focus,
+    .select:focus {
+      border-color: var(--accent-soft);
+      box-shadow: 0 0 0 1px rgba(255, 122, 26, 0.35);
+      background: #070c1d;
     }
 
-    .full {
-      grid-column: 1 / -1;
+    .textarea {
+      resize: vertical;
+      min-height: 70px;
     }
 
-    .hint {
-      font-size: 11px;
-      color: var(--text-soft);
-      margin-top: 6px;
-      line-height: 1.45;
+    .row {
+      display: flex;
+      gap: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .row {
+        flex-direction: column;
+      }
     }
 
     .btn-primary {
       width: 100%;
       border: none;
-      margin-top: 8px;
       border-radius: 999px;
       padding: 12px 18px;
-      font-size: 15px;
+      margin-top: 8px;
+      font-size: 0.95rem;
       font-weight: 600;
-      background: linear-gradient(120deg, var(--accent), var(--accent-soft));
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--accent) 0, #ffb347 100%);
       color: #050814;
       cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+      box-shadow: 0 10px 30px rgba(255, 122, 26, 0.45);
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
+        filter 0.08s;
     }
 
     .btn-primary:hover {
-      filter: brightness(1.05);
-      box-shadow: 0 10px 26px rgba(255, 122, 26, 0.4);
+      filter: brightness(1.04);
       transform: translateY(-1px);
+      box-shadow: 0 18px 40px rgba(255, 122, 26, 0.6);
     }
 
     .btn-primary:active {
-      transform: translateY(0);
-      box-shadow: none;
+      transform: translateY(1px);
+      box-shadow: 0 8px 18px rgba(255, 122, 26, 0.4);
     }
 
-    .msg {
-      margin-top: 10px;
-      font-size: 13px;
-    }
-
-    .msg.ok {
-      color: #56fba7;
-    }
-
-    .msg.err {
-      color: var(--danger);
-    }
-
-    .lista-wrapper {
-      margin-top: 28px;
-      padding-top: 18px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .lista-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      gap: 8px;
-    }
-
-    .lista-header h2 {
-      font-size: 15px;
-    }
-
-    .lista-header small {
-      font-size: 11px;
-      color: var(--text-soft);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    thead {
-      background: #070b17;
-    }
-
-    th, td {
-      padding: 8px 10px;
-      text-align: left;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    }
-
-    th {
-      font-weight: 500;
-      color: var(--text-soft);
-      font-size: 12px;
-    }
-
-    tbody tr:nth-child(even) {
-      background: rgba(255, 255, 255, 0.01);
-    }
-
-    .tag-cor {
+    .badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-    }
-
-    .bolinha {
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(0, 0, 0, 0.4);
-    }
-
-    .btn-del {
-      border: none;
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      background: rgba(12, 18, 40, 0.9);
       border-radius: 999px;
       padding: 4px 10px;
-      font-size: 11px;
-      background: rgba(255, 76, 76, 0.1);
-      color: var(--danger);
+      margin-top: 4px;
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+    }
+
+    /* MULTI-DATE PICKER */
+
+    .dates-display {
+      min-height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+      background: #050918;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
       cursor: pointer;
     }
 
-    .empty {
-      font-size: 12px;
+    .dates-placeholder {
+      font-size: 0.9rem;
+      color: #6c769c;
+    }
+
+    .date-chip {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 122, 26, 0.08);
+      border: 1px solid rgba(255, 122, 26, 0.4);
+      color: var(--text);
+    }
+
+    .calendar-popup {
+      position: absolute;
+      margin-top: 6px;
+      background: #050918;
+      border-radius: 14px;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.75);
+      padding: 10px 12px 12px;
+      z-index: 50;
+      width: 290px;
+    }
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .calendar-header span {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .calendar-nav-btn {
+      border: none;
+      background: transparent;
       color: var(--text-soft);
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 999px;
+      transition: background 0.15s;
+    }
+
+    .calendar-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .calendar-grid {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
       text-align: center;
-      padding: 10px 0 0;
+      user-select: none;
+    }
+
+    .calendar-grid th {
+      font-weight: 500;
+      color: var(--text-soft);
+      padding: 4px 0;
+    }
+
+    .calendar-grid td {
+      width: 14.28%;
+      height: 28px;
+      padding: 2px 0;
+    }
+
+    .calendar-day {
+      width: 26px;
+      height: 26px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.1s, color 0.1s, transform 0.07s;
+      color: var(--text-soft);
+    }
+
+    .calendar-day:hover {
+      background: rgba(255, 122, 26, 0.18);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+
+    .calendar-day.disabled {
+      opacity: 0.2;
+      pointer-events: none;
+    }
+
+    .calendar-day.selected {
+      background: var(--accent-soft);
+      color: #050814;
+      font-weight: 600;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+    }
+
+    /* LISTA DE EVENTOS */
+
+    .events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .event-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #050918;
+      border: 1px solid var(--border-soft);
+      font-size: 0.85rem;
+    }
+
+    .event-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .event-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .event-color-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid #000;
+      flex-shrink: 0;
+    }
+
+    .event-date {
+      color: var(--text-soft);
+      font-size: 0.8rem;
+    }
+
+    .btn-danger {
+      border-radius: 999px;
+      border: none;
+      padding: 4px 9px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      background: rgba(255, 75, 75, 0.16);
+      color: var(--danger);
+      border: 1px solid rgba(255, 75, 75, 0.5);
+      transition: background 0.08s, transform 0.08s, box-shadow 0.08s;
+    }
+
+    .btn-danger:hover {
+      background: rgba(255, 75, 75, 0.28);
+      box-shadow: 0 0 0 1px rgba(255, 75, 75, 0.28);
+      transform: translateY(-1px);
+    }
+
+    .helper {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .msg {
+      margin-top: 6px;
+      font-size: 0.82rem;
+    }
+
+    .msg.ok {
+      color: #7cffb1;
+    }
+
+    .msg.err {
+      color: #ff8a8a;
+    }
+
+    .info-small {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      color: var(--text-soft);
     }
   </style>
 </head>
+
 <body>
-  <div class="wrapper">
-    <div class="header">
-      <h1>Admin – Calendário</h1>
-      <p>
-        Somente quem tem a senha consegue incluir eventos. As atualizações aparecem automaticamente para os usuários.
-      </p>
-    </div>
+  <div class="container">
+    <h1 class="title">Admin – Calendário</h1>
+    <p class="subtitle">
+      Somente quem tem a senha consegue incluir eventos. As atualizações aparecem automaticamente para os usuários.
+    </p>
 
-    <form id="formEvento">
-      <div class="grid">
-        <div class="full">
+    <div class="grid">
+      <!-- COLUNA ESQUERDA – FORMULÁRIO -->
+      <div class="card">
+        <h2 class="card-title">Cadastrar eventos</h2>
+
+        <div class="field">
           <label for="senha">Senha de administrador:</label>
-          <input type="password" id="senha" placeholder="Digite a senha" required />
+          <input id="senha" type="password" class="input" placeholder="Digite a senha" />
         </div>
 
-        <div class="full">
+        <div class="field">
           <label for="titulo">Título do evento:</label>
-          <input type="text" id="titulo" placeholder="Ex.: Reunião de Alinhamento" required />
+          <input
+            id="titulo"
+            type="text"
+            class="input"
+            placeholder="Ex.: Reunião de Alinhamento"
+          />
         </div>
 
-        <div>
-          <label for="dataReferencia">Data de referência do evento:</label>
-          <!-- AQUI ESTÁ O INPUT COM CALENDÁRIO -->
-          <input type="date" id="dataReferencia" required />
-          <div class="hint">
-            Use a data inicial. Para recorrências semanais/mensais, os demais dias serão gerados automaticamente.
+        <div class="field">
+          <label>Datas do evento:</label>
+          <div id="datasWrapper" class="dates-display">
+            <span id="datasPlaceholder" class="dates-placeholder">
+              Clique para escolher as datas do evento
+            </span>
+          </div>
+          <div class="helper">
+            Você pode marcar várias datas (ex.: todas as segundas de um mês). Clique nas datas
+            novamente para desmarcar.
+          </div>
+
+          <!-- POPUP DO CALENDÁRIO MULTI-DATA -->
+          <div id="calendarPopup" class="calendar-popup" style="display: none;">
+            <div class="calendar-header">
+              <button type="button" id="prevMonth" class="calendar-nav-btn">◂</button>
+              <span id="calendarLabel"></span>
+              <button type="button" id="nextMonth" class="calendar-nav-btn">▸</button>
+            </div>
+            <table class="calendar-grid">
+              <thead>
+                <tr>
+                  <th>DOM</th>
+                  <th>SEG</th>
+                  <th>TER</th>
+                  <th>QUA</th>
+                  <th>QUI</th>
+                  <th>SEX</th>
+                  <th>SÁB</th>
+                </tr>
+              </thead>
+              <tbody id="calendarBody"></tbody>
+            </table>
           </div>
         </div>
 
-        <div>
-          <label for="repeticao">Tipo de recorrência:</label>
-          <select id="repeticao">
-            <option value="unico">Evento único</option>
-            <option value="semanal">Toda semana (mesmo dia da semana)</option>
-            <option value="mensal">Todo mês (mesmo dia do mês)</option>
-          </select>
-          <div class="hint">
-            Ex.: "Todo dia 20" → selecione mensal. "Toda segunda" → selecione semanal.
-          </div>
-        </div>
-
-        <div>
-          <label for="dataFim">Repetir até (opcional):</label>
-          <input type="date" id="dataFim" />
-          <div class="hint">
-            Se vazio: gera recorrência somente dentro do mesmo ano da data de referência.
-          </div>
-        </div>
-
-        <div>
+        <div class="field">
           <label for="cor">Cor do evento:</label>
-          <input type="color" id="cor" value="#ff7a1a" />
-          <div class="hint">
-            Use uma cor padrão por tipo de evento (reunião, treinamento, campanha etc.).
+          <input id="cor" type="color" class="input" value="#ff7a1a" style="padding: 4px 6px; height: 40px;" />
+          <div class="helper">
+            Use uma cor padrão por tipo de evento (reunião, treinamento, campanhas etc).
             Feriados já aparecem em cinza automaticamente.
           </div>
         </div>
 
-        <div class="full">
-          <button type="submit" class="btn-primary">Incluir evento(s)</button>
-          <div id="msg" class="msg"></div>
-        </div>
-      </div>
-    </form>
+        <button id="btnIncluir" class="btn-primary">Incluir evento(s)</button>
+        <div id="mensagem" class="msg"></div>
 
-    <div class="lista-wrapper">
-      <div class="lista-header">
-        <h2>Eventos cadastrados</h2>
-        <small>Os mais recentes aparecem primeiro. Exclusão é imediata.</small>
+        <p class="info-small">
+          Os mais recentes aparecem primeiro na lista ao lado. Para remover, clique em “Excluir”.
+        </p>
       </div>
-      <div id="listaEventosContainer"></div>
+
+      <!-- COLUNA DIREITA – LISTA DE EVENTOS -->
+      <div class="card">
+        <h2 class="card-title">Eventos cadastrados</h2>
+        <div id="listaEventos" class="events-list"></div>
+      </div>
     </div>
   </div>
 
   <script>
-    // ========= CONFIGURAÇÕES =========
-    const SENHA_ADMIN = "areia2025";
-    const BASE_URL =
-      "https://agenda-areia-ana-default-rtdb.firebaseio.com"; // ajuste se mudar o projeto
+    // ==== CONFIGURAÇÕES ====
+    const URL_BASE = "https://agenda-areia-ana-default-rtdb.firebaseio.com";
+    const URL_EVENTOS = `${URL_BASE}/eventos.json`;
+    const SENHA = "areia2025"; // <-- altere aqui se quiser outra senha
 
-    const form = document.getElementById("formEvento");
-    const msgEl = document.getElementById("msg");
-    const listaEventosContainer = document.getElementById("listaEventosContainer");
+    // ==== ELEMENTOS DOM ====
+    const senhaInput = document.getElementById("senha");
+    const tituloInput = document.getElementById("titulo");
+    const corInput = document.getElementById("cor");
+    const btnIncluir = document.getElementById("btnIncluir");
+    const msgBox = document.getElementById("mensagem");
+    const listaEventos = document.getElementById("listaEventos");
 
-    // ========= UTILITÁRIOS =========
-    function mostrarMsg(texto, tipo = "ok") {
-      msgEl.textContent = texto;
-      msgEl.className = "msg " + (tipo === "ok" ? "ok" : "err");
+    const datasWrapper = document.getElementById("datasWrapper");
+    const datasPlaceholder = document.getElementById("datasPlaceholder");
+    const calendarPopup = document.getElementById("calendarPopup");
+    const calendarLabel = document.getElementById("calendarLabel");
+    const calendarBody = document.getElementById("calendarBody");
+    const prevMonthBtn = document.getElementById("prevMonth");
+    const nextMonthBtn = document.getElementById("nextMonth");
+
+    // ==== ESTADO DO MULTI-DATE-PICKER ====
+    let selectedDates = new Set(); // guarda strings 'YYYY-MM-DD'
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
+
+    // ---- UTIL ----
+    function formatISOToBR(iso) {
+      const [y, m, d] = iso.split("-");
+      return `${d}/${m}/${y}`;
     }
 
-    function limparMsg() {
-      msgEl.textContent = "";
-      msgEl.className = "msg";
+    function showMessage(text, ok = true) {
+      msgBox.textContent = text;
+      msgBox.className = "msg " + (ok ? "ok" : "err");
+      if (!text) return;
+      setTimeout(() => {
+        msgBox.textContent = "";
+      }, 4000);
     }
 
-    function formatarDataBR(iso) {
-      const [ano, mes, dia] = iso.split("-");
-      return `${dia}/${mes}/${ano}`;
+    // ==== MULTI-DATE PICKER ====
+
+    function renderCalendar() {
+      const firstDay = new Date(currentYear, currentMonth, 1);
+      const firstWeekDay = firstDay.getDay(); // 0=DOM ... 6=SAB
+      const lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      const monthNames = [
+        "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+        "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+      ];
+      calendarLabel.textContent = `${monthNames[currentMonth]} de ${currentYear}`;
+
+      calendarBody.innerHTML = "";
+
+      let day = 1;
+      for (let row = 0; row < 6; row++) {
+        const tr = document.createElement("tr");
+
+        for (let col = 0; col < 7; col++) {
+          const td = document.createElement("td");
+          const wrapper = document.createElement("div");
+          wrapper.classList.add("calendar-day");
+
+          const cellIndex = row * 7 + col;
+          if (cellIndex >= firstWeekDay && day <= lastDay) {
+            wrapper.textContent = day;
+            const iso = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+            wrapper.dataset.iso = iso;
+
+            if (selectedDates.has(iso)) {
+              wrapper.classList.add("selected");
+            }
+
+            wrapper.addEventListener("click", () => toggleDate(iso));
+            day++;
+          } else {
+            wrapper.classList.add("disabled");
+            wrapper.textContent = "";
+          }
+
+          td.appendChild(wrapper);
+          tr.appendChild(td);
+        }
+
+        calendarBody.appendChild(tr);
+        if (day > lastDay) break;
+      }
     }
 
-    function parseISO(dataStr) {
-      // dataStr no formato yyyy-mm-dd
-      const [y, m, d] = dataStr.split("-").map(Number);
-      return new Date(y, m - 1, d);
-    }
-
-    function toISO(date) {
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, "0");
-      const d = String(date.getDate()).padStart(2, "0");
-      return `${y}-${m}-${d}`;
-    }
-
-    // Gera um array de datas ISO (yyyy-mm-dd) conforme recorrência
-    function gerarDatas(dataRefISO, dataFimISO, tipoRepeticao) {
-      const datas = [];
-
-      let atual = parseISO(dataRefISO);
-
-      let limite;
-      if (dataFimISO) {
-        limite = parseISO(dataFimISO);
+    function toggleDate(iso) {
+      if (selectedDates.has(iso)) {
+        selectedDates.delete(iso);
       } else {
-        // se não tiver data fim → até o final do ano da data de referência
-        limite = new Date(atual.getFullYear(), 11, 31); // 31/12
+        selectedDates.add(iso);
       }
-
-      if (tipoRepeticao === "unico") {
-        datas.push(dataRefISO);
-        return datas;
-      }
-
-      if (tipoRepeticao === "semanal") {
-        while (atual <= limite) {
-          datas.push(toISO(atual));
-          atual.setDate(atual.getDate() + 7);
-        }
-        return datas;
-      }
-
-      if (tipoRepeticao === "mensal") {
-        const dia = atual.getDate();
-        while (atual <= limite) {
-          datas.push(toISO(atual));
-
-          const mes = atual.getMonth();
-          const ano = atual.getFullYear();
-          const proximo = new Date(ano, mes + 1, 1);
-          const ultimoDiaProxMes = new Date(ano, mes + 2, 0).getDate();
-
-          proximo.setDate(Math.min(dia, ultimoDiaProxMes));
-          atual = proximo;
-        }
-        return datas;
-      }
-
-      // fallback
-      datas.push(dataRefISO);
-      return datas;
+      renderCalendar();
+      renderSelectedDatesDisplay();
     }
 
-    // ========= FIREBASE =========
+    function renderSelectedDatesDisplay() {
+      datasWrapper.innerHTML = "";
+
+      if (selectedDates.size === 0) {
+        datasWrapper.appendChild(datasPlaceholder);
+        datasPlaceholder.style.display = "inline";
+        return;
+      }
+
+      datasPlaceholder.style.display = "none";
+
+      const sorted = Array.from(selectedDates).sort();
+      sorted.forEach((iso) => {
+        const chip = document.createElement("span");
+        chip.className = "date-chip";
+        chip.textContent = formatISOToBR(iso);
+        datasWrapper.appendChild(chip);
+      });
+    }
+
+    // abrir/fechar popup
+    let popupOpen = false;
+
+    function openPopup() {
+      calendarPopup.style.display = "block";
+      popupOpen = true;
+      renderCalendar();
+    }
+
+    function closePopup() {
+      calendarPopup.style.display = "none";
+      popupOpen = false;
+    }
+
+    datasWrapper.addEventListener("click", (e) => {
+      e.stopPropagation();
+      popupOpen ? closePopup() : openPopup();
+    });
+
+    prevMonthBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderCalendar();
+    });
+
+    nextMonthBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar();
+    });
+
+    // fecha popup se clicar fora
+    document.addEventListener("click", (e) => {
+      if (!popupOpen) return;
+      if (!calendarPopup.contains(e.target) && e.target !== datasWrapper && !datasWrapper.contains(e.target)) {
+        closePopup();
+      }
+    });
+
+    // ==== FIREBASE – CARREGAR & EXCLUIR ====
+
     async function carregarEventos() {
+      listaEventos.innerHTML = "<span class='helper'>Carregando eventos...</span>";
       try {
-        const resp = await fetch(`${BASE_URL}/eventos.json`);
+        const resp = await fetch(URL_EVENTOS);
         const data = await resp.json();
 
         if (!data) {
-          listaEventosContainer.innerHTML =
-            '<div class="empty">Nenhum evento cadastrado ainda.</div>';
+          listaEventos.innerHTML = "<span class='helper'>Nenhum evento cadastrado ainda.</span>";
           return;
         }
 
-        const lista = Object.entries(data).map(([id, ev]) => ({
-          id,
-          ...ev,
-        }));
+        const itens = Object.entries(data).map(([id, ev]) => ({ id, ...ev }));
+        itens.sort((a, b) => (a.data < b.data ? 1 : -1)); // mais recentes primeiro
 
-        lista.sort((a, b) => (a.data < b.data ? 1 : -1)); // mais recentes primeiro
+        listaEventos.innerHTML = "";
 
-        let html = `
-          <table>
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Título</th>
-                <th>Cor</th>
-                <th style="text-align:right;">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
+        itens.forEach((ev) => {
+          const li = document.createElement("div");
+          li.className = "event-item";
 
-        for (const ev of lista) {
-          html += `
-            <tr>
-              <td>${ev.data ? formatarDataBR(ev.data) : "-"}</td>
-              <td>${ev.titulo || ""}</td>
-              <td>
-                <span class="tag-cor">
-                  <span class="bolinha" style="background:${ev.cor || "#ff7a1a"}"></span>
-                  ${ev.cor || ""}
-                </span>
-              </td>
-              <td style="text-align:right;">
-                <button type="button" class="btn-del" onclick="excluirEvento('${ev.id}')">
-                  Excluir
-                </button>
-              </td>
-            </tr>
-          `;
-        }
+          const main = document.createElement("div");
+          main.className = "event-main";
 
-        html += "</tbody></table>";
-        listaEventosContainer.innerHTML = html;
+          const titleRow = document.createElement("div");
+          titleRow.className = "event-title";
+
+          const dot = document.createElement("div");
+          dot.className = "event-color-dot";
+          dot.style.background = ev.cor || "#ff7a1a";
+
+          const titleText = document.createElement("span");
+          titleText.textContent = ev.titulo || "(sem título)";
+
+          titleRow.appendChild(dot);
+          titleRow.appendChild(titleText);
+
+          const dateText = document.createElement("span");
+          dateText.className = "event-date";
+          dateText.textContent = formatISOToBR(ev.data);
+
+          main.appendChild(titleRow);
+          main.appendChild(dateText);
+
+          const btnDel = document.createElement("button");
+          btnDel.className = "btn-danger";
+          btnDel.textContent = "Excluir";
+          btnDel.addEventListener("click", () => excluirEvento(ev.id));
+
+          li.appendChild(main);
+          li.appendChild(btnDel);
+
+          listaEventos.appendChild(li);
+        });
       } catch (e) {
         console.error(e);
-        listaEventosContainer.innerHTML =
-          '<div class="empty">Erro ao carregar eventos.</div>';
+        listaEventos.innerHTML = "<span class='helper'>Erro ao carregar eventos.</span>";
       }
     }
 
     async function excluirEvento(id) {
       if (!confirm("Tem certeza que deseja excluir este evento?")) return;
+
       try {
-        await fetch(`${BASE_URL}/eventos/${id}.json`, {
+        const resp = await fetch(`${URL_BASE}/eventos/${id}.json`, {
           method: "DELETE",
         });
+        if (!resp.ok) throw new Error("Falha ao excluir");
+        showMessage("Evento excluído.", true);
         await carregarEventos();
       } catch (e) {
         console.error(e);
-        alert("Erro ao excluir evento. Tente novamente.");
+        showMessage("Erro ao excluir evento.", false);
       }
     }
 
-    window.excluirEvento = excluirEvento; // deixa disponível no HTML
+    // ==== INCLUIR EVENTOS ====
 
-    // ========= SUBMIT FORM =========
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      limparMsg();
+    btnIncluir.addEventListener("click", async () => {
+      const senha = senhaInput.value.trim();
+      const titulo = tituloInput.value.trim();
+      const cor = corInput.value || "#ff7a1a";
 
-      const senha = document.getElementById("senha").value.trim();
-      if (senha !== SENHA_ADMIN) {
-        mostrarMsg("Senha incorreta.", "err");
+      if (senha !== SENHA) {
+        showMessage("Senha incorreta.", false);
+        return;
+      }
+      if (!titulo) {
+        showMessage("Informe o título do evento.", false);
+        return;
+      }
+      if (selectedDates.size === 0) {
+        showMessage("Selecione pelo menos uma data para o evento.", false);
         return;
       }
 
-      const titulo = document.getElementById("titulo").value.trim();
-      const dataRef = document.getElementById("dataReferencia").value;
-      const tipoRep = document.getElementById("repeticao").value;
-      const dataFim = document.getElementById("dataFim").value || null;
-      const cor = document.getElementById("cor").value || "#ff7a1a";
-
-      if (!titulo || !dataRef) {
-        mostrarMsg("Preencha pelo menos o título e a data de referência.", "err");
-        return;
-      }
-
-      const datasGeradas = gerarDatas(dataRef, dataFim, tipoRep);
-      if (!datasGeradas.length) {
-        mostrarMsg("Nenhuma data gerada. Verifique os campos.", "err");
-        return;
-      }
+      const datas = Array.from(selectedDates);
 
       try {
-        for (const dataISO of datasGeradas) {
-          const novoEv = {
-            data: dataISO,
-            titulo,
-            cor,
-            criadoEm: new Date().toISOString(),
-          };
+        btnIncluir.disabled = true;
+        btnIncluir.textContent = "Incluindo...";
 
-          await fetch(`${BASE_URL}/eventos.json`, {
+        const promises = datas.map((iso) =>
+          fetch(URL_EVENTOS, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(novoEv),
-          });
+            body: JSON.stringify({
+              data: iso,
+              titulo,
+              cor,
+            }),
+          })
+        );
+
+        const resps = await Promise.all(promises);
+        if (!resps.every((r) => r.ok)) {
+          throw new Error("Falha ao salvar algum evento");
         }
 
-        mostrarMsg(
-          `Evento salvo com sucesso em ${datasGeradas.length} data(s).`,
-          "ok"
-        );
-        form.reset();
-        document.getElementById("cor").value = "#ff7a1a";
+        showMessage("Eventos incluídos com sucesso!", true);
+        // limpa campos
+        tituloInput.value = "";
+        selectedDates.clear();
+        renderSelectedDatesDisplay();
+        senhaInput.value = "";
+
         await carregarEventos();
-      } catch (err) {
-        console.error(err);
-        mostrarMsg("Erro ao salvar eventos. Tente novamente.", "err");
+      } catch (e) {
+        console.error(e);
+        showMessage("Erro ao incluir eventos.", false);
+      } finally {
+        btnIncluir.disabled = false;
+        btnIncluir.textContent = "Incluir evento(s)";
       }
     });
 
-    // Carregar lista inicial
+    // ==== INICIALIZA ====
+    renderSelectedDatesDisplay();
+    renderCalendar();
     carregarEventos();
   </script>
 </body>
