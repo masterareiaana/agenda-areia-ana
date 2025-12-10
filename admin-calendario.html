@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Admin – Calendário Areia Ana</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
     :root {
@@ -12,173 +11,461 @@
       --card: #0b1020;
       --card-soft: #101629;
       --accent: #ff7a1a;
-      --accent-soft: #ffb200;
+      --accent-soft: #ff9b4a;
       --text: #f5f7ff;
-      --soft: #c2c7ff;
+      --text-soft: #c2c7ff;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: radial-gradient(circle at top, #151821 0, #050814 45%, #02030a 100%);
       color: var(--text);
-      font-family: Inter, system-ui, sans-serif;
-      margin: 0;
       min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       padding: 24px;
     }
 
-    .card {
+    .wrap {
       background: var(--card);
-      padding: 22px 22px 18px;
       border-radius: 16px;
-      max-width: 420px;
+      padding: 32px 24px;
+      max-width: 720px;
       width: 100%;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
     }
 
     h1 {
-      font-size: 22px;
-      margin: 0 0 4px;
+      margin: 0 0 8px;
       text-align: center;
+      font-size: 24px;
     }
 
-    .subtitle {
-      font-size: 12px;
-      color: var(--soft);
+    .sub {
       text-align: center;
-      margin-bottom: 16px;
+      font-size: 13px;
+      color: var(--text-soft);
+      margin-bottom: 24px;
     }
 
     label {
+      font-size: 13px;
+      color: var(--text-soft);
       display: block;
-      font-size: 12px;
       margin-bottom: 4px;
     }
 
-    input {
-      width: 100%;
-      padding: 9px 10px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: var(--card-soft);
-      color: var(--text);
-      font-size: 13px;
-      outline: none;
-    }
-
-    input[type="color"] {
-      padding: 0;
-      height: 36px;
-      cursor: pointer;
-    }
-
-    button {
+    input[type="password"],
+    input[type="date"],
+    input[type="text"],
+    input[type="color"],
+    select {
       width: 100%;
       padding: 10px 12px;
-      border-radius: 999px;
-      border: none;
-      background: linear-gradient(135deg, var(--accent), var(--accent-soft));
-      color: #050814;
-      font-weight: 700;
+      border-radius: 10px;
+      border: 1px solid #1b2238;
+      background: var(--card-soft);
+      color: var(--text);
       font-size: 14px;
-      cursor: pointer;
-      margin-top: 8px;
+      outline: none;
+      transition: border 0.15s, box-shadow 0.15s;
     }
 
-    button:hover {
-      filter: brightness(1.05);
-      transform: translateY(-1px);
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(255, 122, 26, 0.3);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 12px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .btn-main {
+      width: 100%;
+      border: none;
+      border-radius: 999px;
+      padding: 12px 18px;
+      margin-top: 8px;
+      background: var(--accent);
+      color: #000;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.05s;
+    }
+
+    .btn-main:hover {
+      background: var(--accent-soft);
+    }
+
+    .btn-main:active {
+      transform: scale(0.98);
     }
 
     .hint {
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    /* Tabela de eventos */
+    h2 {
+      margin-top: 28px;
+      font-size: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    thead {
+      background: #080d1d;
+    }
+
+    th, td {
+      padding: 8px 6px;
+      text-align: left;
+      border-bottom: 1px solid #1b2238;
+    }
+
+    th {
+      font-weight: 500;
+      color: var(--text-soft);
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .cor-preview {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1px solid #22293e;
+    }
+
+    .actions button {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      margin-right: 4px;
+    }
+
+    .btn-edit {
+      background: #2f82ff;
+      color: #fff;
+    }
+
+    .btn-del {
+      background: #ff4b4b;
+      color: #fff;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
       font-size: 11px;
-      color: var(--soft);
-      margin-top: 6px;
-      line-height: 1.4;
+      background: #151b2e;
+      color: var(--text-soft);
+    }
+
+    @media (max-width: 640px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .wrap {
+        padding: 24px 18px;
+      }
     }
   </style>
 </head>
-
 <body>
-  <div class="card">
+  <div class="wrap">
     <h1>Admin – Calendário</h1>
-    <p class="subtitle">
-      Somente quem tem a senha consegue incluir eventos.
+    <p class="sub">
+      Só quem tem a senha consegue incluir, editar ou excluir eventos.
       As atualizações aparecem automaticamente para os usuários.
     </p>
 
-    <label for="senha">Senha de administrador:</label>
-    <input type="password" id="senha" placeholder="Digite a senha">
+    <form id="form-admin">
+      <div class="field">
+        <label>Senha de administrador:</label>
+        <input type="password" id="senha" autocomplete="off" />
+      </div>
 
-    <label for="data">Data do evento:</label>
-    <input type="date" id="data">
+      <div class="field">
+        <label>Data de referência do evento:</label>
+        <input type="date" id="data" />
+      </div>
 
-    <label for="titulo">Título do evento:</label>
-    <input type="text" id="titulo" placeholder="Ex.: Reunião de Alinhamento">
+      <div class="field">
+        <label>Título do evento:</label>
+        <input type="text" id="titulo" placeholder="Ex.: Reunião de Alinhamento" />
+      </div>
 
-    <label for="cor">Cor do evento:</label>
-    <input type="color" id="cor" value="#ff7a1a">
+      <div class="field">
+        <label>Repetição:</label>
+        <select id="repeticao">
+          <option value="unico">Evento único (só nesse dia)</option>
+          <option value="mensal">Todo mês neste dia (ex.: todo dia 20)</option>
+          <option value="semanal">Toda semana neste dia da semana</option>
+        </select>
+      </div>
 
-    <button onclick="incluirEvento()">Incluir evento</button>
+      <div class="field grid-2">
+        <div>
+          <label>Cor do evento:</label>
+          <input type="color" id="cor" value="#ff7a1a" />
+        </div>
+      </div>
 
+      <button type="submit" class="btn-main" id="btn-salvar">Incluir evento</button>
+
+      <p class="hint">
+        💡 Dica: escolha cores fixas por tipo de evento (reuniões, treinamentos, campanhas etc.).
+        Os feriados já aparecem em cinza automaticamente.
+      </p>
+    </form>
+
+    <h2>Eventos cadastrados</h2>
     <p class="hint">
-      Dica: escolha cores fixas por tipo de evento (reuniões, treinamentos, campanhas etc).
-      Os feriados já aparecem em cinza automaticamente.
+      Aqui você consegue ver tudo o que está configurado, editar ou apagar algum evento.
+      Se apagar um evento recorrente, ele some de todas as datas correspondentes no calendário.
     </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Recorrência</th>
+          <th>Data base</th>
+          <th>Cor</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="lista-eventos">
+        <!-- preenchido via JS -->
+      </tbody>
+    </table>
   </div>
 
   <script>
-    // Mesmo nó do calendário
-    const DB_URL = "https://agenda-areia-ana-default-rtdb.firebaseio.com/eventos.json";
-    // Senha de admin
+    // 🔗 URL do Realtime Database
+    const URL_DB = "https://agenda-areia-ana-default-rtdb.firebaseio.com";
+    // 🔒 Senha do admin
     const SENHA = "areia2025";
 
-    async function incluirEvento() {
-      const senhaDigitada = document.getElementById("senha").value;
-      if (senhaDigitada !== SENHA) {
+    let eventosCache = {};   // { id: evento }
+    let idEditando = null;   // se estiver preenchido, estamos editando
+
+    // Helpers
+    function formatarDataBr(iso) {
+      if (!iso) return "-";
+      const [y, m, d] = iso.split("-");
+      return `${d}/${m}/${y}`;
+    }
+
+    function nomeDiaSemana(idx) {
+      // getDay: 0 = domingo ... 6 = sábado
+      const nomes = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
+      return nomes[idx] || "";
+    }
+
+    function descricaoRecorrencia(ev) {
+      if (!ev || !ev.tipo) return "-";
+      switch (ev.tipo) {
+        case "unico":
+          return "Evento único";
+        case "mensal":
+          return `Todo mês no dia ${ev.diaMes}`;
+        case "semanal":
+          return `Toda ${nomeDiaSemana(ev.diaSemana)}`;
+        default:
+          return ev.tipo;
+      }
+    }
+
+    // Renderizar tabela
+    function renderizarTabela() {
+      const corpo = document.getElementById("lista-eventos");
+      corpo.innerHTML = "";
+
+      if (!eventosCache) return;
+
+      Object.entries(eventosCache).forEach(([id, ev]) => {
+        if (!ev) return;
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${ev.titulo || "-"}</td>
+          <td><span class="tag">${descricaoRecorrencia(ev)}</span></td>
+          <td>${formatarDataBr(ev.data)}</td>
+          <td><span class="cor-preview" style="background:${ev.cor || "#ff7a1a"}"></span></td>
+          <td class="actions">
+            <button class="btn-edit" type="button" onclick="editarEvento('${id}')">Editar</button>
+            <button class="btn-del" type="button" onclick="excluirEvento('${id}')">Excluir</button>
+          </td>
+        `;
+
+        corpo.appendChild(tr);
+      });
+    }
+
+    // Carregar eventos do Firebase
+    async function carregarEventos() {
+      try {
+        const resp = await fetch(`${URL_DB}/eventos.json`);
+        const dados = await resp.json();
+        eventosCache = dados || {};
+        renderizarTabela();
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao carregar eventos. Tenta recarregar a página.");
+      }
+    }
+
+    // Salvar (criar ou atualizar)
+    document.getElementById("form-admin").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const senha = document.getElementById("senha").value.trim();
+      if (senha !== SENHA) {
         alert("Senha incorreta.");
         return;
       }
 
       const data = document.getElementById("data").value;
       const titulo = document.getElementById("titulo").value.trim();
-      const cor = document.getElementById("cor").value;
+      const repeticao = document.getElementById("repeticao").value;
+      const cor = document.getElementById("cor").value || "#ff7a1a";
 
-      if (!data || !titulo) {
-        alert("Preencha a data e o título do evento.");
+      if (!data) {
+        alert("Informe a data base do evento.");
+        return;
+      }
+      if (!titulo) {
+        alert("Informe o título do evento.");
         return;
       }
 
+      const dt = new Date(data + "T00:00:00");
+      const diaMes = dt.getDate();
+      const diaSemana = dt.getDay();
+
+      const payload = {
+        titulo,
+        tipo: repeticao,   // "unico" | "mensal" | "semanal"
+        data,
+        diaMes,
+        diaSemana,
+        cor
+      };
+
       try {
-        // 1. Busca lista atual de eventos
-        const resp = await fetch(DB_URL);
-        let eventos = await resp.json();
-        if (!Array.isArray(eventos)) eventos = [];
+        let url = `${URL_DB}/eventos.json`;
+        let method = "POST";
 
-        // 2. Adiciona novo evento
-        eventos.push({ data, titulo, cor });
+        if (idEditando) {
+          url = `${URL_DB}/eventos/${idEditando}.json`;
+          method = "PATCH";
+        }
 
-        // 3. Salva de volta no Firebase
-        await fetch(DB_URL, {
-          method: "PUT",
+        const resp = await fetch(url, {
+          method,
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(eventos)
+          body: JSON.stringify(payload)
         });
 
-        alert("Evento incluído com sucesso!");
+        if (!resp.ok) {
+          throw new Error("Erro HTTP " + resp.status);
+        }
 
-        // limpa campos (menos a senha, pra agilizar)
+        if (!idEditando) {
+          const resJson = await resp.json();
+          const novoId = resJson.name;
+          eventosCache[novoId] = payload;
+        } else {
+          eventosCache[idEditando] = payload;
+          idEditando = null;
+          document.getElementById("btn-salvar").textContent = "Incluir evento";
+        }
+
+        // limpa formulário (menos a senha)
         document.getElementById("data").value = "";
         document.getElementById("titulo").value = "";
+        document.getElementById("repeticao").value = "unico";
+        document.getElementById("cor").value = "#ff7a1a";
 
-      } catch (e) {
-        console.error(e);
-        alert("Erro ao salvar o evento. Confere se o Firebase está certo.");
+        renderizarTabela();
+        alert("Evento salvo com sucesso!");
+
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao salvar evento.");
       }
-    }
+    });
+
+    // Editar
+    window.editarEvento = function (id) {
+      const ev = eventosCache[id];
+      if (!ev) return;
+
+      idEditando = id;
+      document.getElementById("data").value = ev.data || "";
+      document.getElementById("titulo").value = ev.titulo || "";
+      document.getElementById("repeticao").value = ev.tipo || "unico";
+      document.getElementById("cor").value = ev.cor || "#ff7a1a";
+
+      document.getElementById("btn-salvar").textContent = "Salvar alterações";
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    // Excluir
+    window.excluirEvento = async function (id) {
+      const ev = eventosCache[id];
+      const nome = ev?.titulo || "este evento";
+
+      if (!confirm(`Tem certeza que deseja excluir ${nome}?`)) return;
+
+      try {
+        const resp = await fetch(`${URL_DB}/eventos/${id}.json`, {
+          method: "DELETE"
+        });
+        if (!resp.ok) throw new Error("Erro ao excluir");
+
+        delete eventosCache[id];
+        renderizarTabela();
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao excluir evento.");
+      }
+    };
+
+    // Carrega tudo ao abrir
+    carregarEventos();
   </script>
 </body>
 </html>
