@@ -59,6 +59,7 @@
     .title-block h1 {
       font-size: 1.4rem;
       margin: 0;
+      text-align: left;
     }
 
     .title-block p {
@@ -72,6 +73,7 @@
       flex-wrap: wrap;
       gap: 8px;
       align-items: center;
+      justify-content: flex-end;
     }
 
     .controls label {
@@ -177,7 +179,7 @@
     .day-cell {
       position: relative;
       height: 40px;
-      cursor: default;
+      cursor: pointer;
       transition: background 0.15s, box-shadow 0.15s, transform 0.05s;
     }
 
@@ -189,14 +191,19 @@
       color: var(--text-soft);
     }
 
+    /* SEM fundo laranja, só um contorninho leve */
     .day-cell.has-event {
-      background: rgba(255, 122, 26, 0.14);
-      box-shadow: inset 0 0 0 1px rgba(255, 122, 26, 0.45);
+      background: #050814;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
     }
 
     .day-cell.has-event:hover {
-      background: rgba(255, 122, 26, 0.2);
+      background: #080d1a;
       transform: translateY(-1px);
+    }
+
+    .day-cell:hover {
+      background: #070c1a;
     }
 
     .day-dot {
@@ -218,6 +225,11 @@
       background: #050814;
       box-shadow: none;
       cursor: default;
+    }
+
+    .day-cell.empty:hover {
+      background: #050814;
+      transform: none;
     }
 
     /* Calendário anual: grade 6 x 2 */
@@ -273,6 +285,7 @@
     .mini-day {
       position: relative;
       height: 22px;
+      cursor: pointer;
     }
 
     .mini-day span {
@@ -280,8 +293,12 @@
     }
 
     .mini-day.has-event {
-      background: rgba(255, 122, 26, 0.15);
-      box-shadow: inset 0 0 0 1px rgba(255, 122, 26, 0.4);
+      background: rgba(255, 122, 26, 0.12);
+      box-shadow: inset 0 0 0 1px rgba(255, 122, 26, 0.25);
+    }
+
+    .mini-day:hover {
+      background: #070c1a;
     }
 
     .mini-dot {
@@ -299,15 +316,40 @@
       background: var(--feriado);
     }
 
+    /* Detalhes do dia clicado */
+    .event-details {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #080d1a;
+      border: 1px solid var(--border-soft);
+      font-size: 0.8rem;
+    }
+
+    .event-details strong {
+      color: var(--accent-soft);
+    }
+
+    .event-details ul {
+      margin: 6px 0 0;
+      padding-left: 18px;
+    }
+
+    .event-details li {
+      margin-bottom: 2px;
+    }
+
     /* Legenda */
     .legend {
       margin-top: 16px;
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 12px;
       font-size: 0.8rem;
       color: var(--text-soft);
       align-items: center;
+      justify-content: center;
+      text-align: center;
     }
 
     .legend-title {
@@ -332,8 +374,11 @@
       background: var(--feriado);
     }
 
-    .legend-dot.evento {
-      background: var(--accent-soft);
+    .legend-dynamic {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
     }
 
     @media (max-width: 1024px) {
@@ -422,11 +467,16 @@
         <div class="year-grid" id="yearGrid"></div>
       </div>
 
+      <!-- Detalhes do dia clicado -->
+      <div id="detalhesEvento" class="event-details" style="display:none;"></div>
+
       <!-- Legenda -->
       <div class="legend">
         <span class="legend-title">Legenda de eventos</span>
-        <span class="legend-item"><span class="legend-dot feriado"></span>Feriado nacional</span>
-        <span class="legend-item"><span class="legend-dot evento"></span>Evento cadastrado</span>
+        <span class="legend-item">
+          <span class="legend-dot feriado"></span>Feriado nacional
+        </span>
+        <div id="legendEventos" class="legend-dynamic"></div>
       </div>
     </div>
   </div>
@@ -463,10 +513,15 @@
     const btnPrev = document.getElementById("btnPrev");
     const btnNext = document.getElementById("btnNext");
     const selectMesWrapper = document.getElementById("selectMesWrapper");
+    const detalhesEvento = document.getElementById("detalhesEvento");
+    const legendEventos = document.getElementById("legendEventos");
 
     let anoAtual = new Date().getFullYear();
     let mesAtual = new Date().getMonth(); // 0-11
     let eventosCarregados = {}; // { id: { data, titulo, cor, tipoRecorrencia } }
+
+    let ultimoMapaAno = null;
+    let ultimoAnoMapa = null;
 
     // === INICIALIZAÇÃO ===
     function popularSelects() {
@@ -502,6 +557,29 @@
         console.error("Erro ao carregar eventos do Firebase:", e);
         eventosCarregados = {};
       }
+      atualizarLegendaEventos();
+    }
+
+    // Legenda dinâmica dos eventos
+    function atualizarLegendaEventos() {
+      legendEventos.innerHTML = "";
+      if (!eventosCarregados) return;
+
+      const mapa = {}; // titulo -> cor
+      Object.values(eventosCarregados).forEach(ev => {
+        if (!ev || !ev.titulo) return;
+        const cor = ev.cor || "#ff7a1a";
+        if (!mapa[ev.titulo]) {
+          mapa[ev.titulo] = cor;
+        }
+      });
+
+      Object.entries(mapa).forEach(([titulo, cor]) => {
+        const span = document.createElement("span");
+        span.className = "legend-item";
+        span.innerHTML = `<span class="legend-dot" style="background:${cor};"></span>${titulo}`;
+        legendEventos.appendChild(span);
+      });
     }
 
     // Gera mapa { 'YYYY-MM-DD': [ { titulo, cor, feriado:bool } ] }
@@ -541,32 +619,27 @@
           }
 
           if (tipo === "unico") {
-            // Só naquele ano exato
             if (baseDate.getFullYear() === ano) {
               adiciona(baseDate);
             }
           } else if (tipo === "anual") {
-            // Mesma data em todos os anos
             const d = baseDate.getDate();
             const m = baseDate.getMonth();
             adiciona(new Date(ano, m, d));
           } else if (tipo === "mensal") {
-            // Todo mês no mesmo dia
             const diaMes = baseDate.getDate();
             for (let m = 0; m < 12; m++) {
               const dt = new Date(ano, m, diaMes);
               adiciona(dt);
             }
           } else if (tipo === "semanal") {
-            // Toda semana a partir da data base
             let dt = new Date(baseDate);
             while (dt.getFullYear() <= ano + 1) {
               if (dt.getFullYear() === ano) adiciona(dt);
               dt.setDate(dt.getDate() + 7);
-              if (dt.getFullYear() > ano && tipo === "semanal") break;
+              if (dt.getFullYear() > ano) break;
             }
           } else {
-            // fallback = único
             if (baseDate.getFullYear() === ano) adiciona(baseDate);
           }
         });
@@ -575,15 +648,46 @@
       return mapa;
     }
 
+    // Mostrar detalhes dos eventos de uma data
+    function mostrarDetalhes(dataStr) {
+      const [y, m, d] = dataStr.split("-");
+      const ano = parseInt(y, 10);
+
+      if (ultimoAnoMapa !== ano || !ultimoMapaAno) {
+        ultimoMapaAno = montarMapaEventos(ano);
+        ultimoAnoMapa = ano;
+      }
+
+      const eventosDia = ultimoMapaAno[dataStr] || [];
+      if (!eventosDia.length) {
+        detalhesEvento.style.display = "none";
+        return;
+      }
+
+      const dataFormatada = `${d.padStart(2,"0")}/${m.padStart(2,"0")}/${y}`;
+      let html = `<strong>Eventos em ${dataFormatada}</strong><ul>`;
+      eventosDia.forEach(ev => {
+        const cor = ev.cor || (ev.feriado ? "#777" : "#ff7a1a");
+        const corDot = ev.feriado ? "var(--feriado)" : cor;
+        const titulo = ev.titulo || (ev.feriado ? "Feriado" : "Evento");
+        html += `<li><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${corDot};margin-right:6px;"></span>${titulo}</li>`;
+      });
+      html += "</ul>";
+
+      detalhesEvento.innerHTML = html;
+      detalhesEvento.style.display = "block";
+    }
+
     // === RENDER MENSAL ===
     function desenharMensal(ano, mes) {
       const mapaEventos = montarMapaEventos(ano);
+      ultimoMapaAno = mapaEventos;
+      ultimoAnoMapa = ano;
 
       labelMesAno.textContent = `${mesesNomes[mes]} ${ano}`;
       selectAno.value = ano;
       selectMes.value = mes;
 
-      // Cabeçalho
       let html = `
         <thead>
           <tr>
@@ -600,7 +704,6 @@
         <tbody>
       `;
 
-      // Descobrir primeiro dia da grade (segunda-feira da semana que contém o dia 1)
       const primeiroDiaMes = new Date(ano, mes, 1);
       const diaSemana = (primeiroDiaMes.getDay() + 6) % 7; // segunda=0
       const inicioGrade = new Date(ano, mes, 1 - diaSemana);
@@ -628,7 +731,7 @@
             let classes = "day-cell";
             if (temEvento) classes += " has-event";
 
-            html += `<td class="${classes}">`;
+            html += `<td class="${classes}" data-date="${dataStr}">`;
             html += `<span class="day-number">${d}</span>`;
 
             if (temEvento) {
@@ -652,6 +755,9 @@
     // === RENDER ANUAL ===
     function desenharAnual(ano) {
       const mapaEventos = montarMapaEventos(ano);
+      ultimoMapaAno = mapaEventos;
+      ultimoAnoMapa = ano;
+
       yearGrid.innerHTML = "";
 
       for (let mes = 0; mes < 12; mes++) {
@@ -702,7 +808,7 @@
               let classes = "mini-day";
               if (temEvento) classes += " has-event";
 
-              html += `<td class="${classes}"><span>${d}</span>`;
+              html += `<td class="${classes}" data-date="${dataStr}"><span>${d}</span>`;
               if (temEvento) {
                 const temFeriado = eventosDia.some(e => e.feriado);
                 html += `<div class="mini-dot ${temFeriado ? "feriado" : ""}"></div>`;
@@ -726,6 +832,7 @@
       const modo = selectModo.value;
       anoAtual = parseInt(selectAno.value, 10);
       mesAtual = parseInt(selectMes.value, 10);
+      detalhesEvento.style.display = "none";
 
       if (modo === "mensal") {
         gradeAnual.style.display = "none";
@@ -770,6 +877,17 @@
       }
       atualizarVisualizacao();
     });
+
+    // Clique nas datas (mensal e anual)
+    function handleClickData(e) {
+      const cell = e.target.closest("td[data-date]");
+      if (!cell) return;
+      const dataStr = cell.dataset.date;
+      mostrarDetalhes(dataStr);
+    }
+
+    tabelaMensal.addEventListener("click", handleClickData);
+    yearGrid.addEventListener("click", handleClickData);
 
     // === START ===
     (async function init() {
