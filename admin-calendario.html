@@ -1,38 +1,184 @@
-<script>
-const URL = "https://agenda-areia-ana-default-rtdb.firebaseio.com/eventos.json";
-const SENHA = "areia2025"; // senha de admin
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Calendário Areia Ana</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-async function incluirEvento() {
+  <style>
+    :root {
+      --bg: #050814;
+      --card: #0b1020;
+      --card-soft: #101629;
+      --accent: #ff7a1a;
+      --accent-soft: #ffb200;
+      --text: #f5f7ff;
+      --soft: #c2c7ff;
+    }
 
-    const senhaDigitada = document.getElementById("senha").value;
-    if (senhaDigitada !== SENHA) {
+    body {
+      background: radial-gradient(circle at top, #151821 0, #050814 45%, #02030a 100%);
+      color: var(--text);
+      font-family: Inter, system-ui, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 22px 22px 18px;
+      border-radius: 16px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0 0 4px;
+      text-align: center;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--soft);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    input {
+      width: 100%;
+      padding: 9px 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: var(--card-soft);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+    }
+
+    input[type="color"] {
+      padding: 0;
+      height: 36px;
+      cursor: pointer;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+      color: #050814;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    button:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--soft);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Admin – Calendário</h1>
+    <p class="subtitle">
+      Somente quem tem a senha consegue incluir eventos.
+      As atualizações aparecem automaticamente para os usuários.
+    </p>
+
+    <label for="senha">Senha de administrador:</label>
+    <input type="password" id="senha" placeholder="Digite a senha">
+
+    <label for="data">Data do evento:</label>
+    <input type="date" id="data">
+
+    <label for="titulo">Título do evento:</label>
+    <input type="text" id="titulo" placeholder="Ex.: Reunião de Alinhamento">
+
+    <label for="cor">Cor do evento:</label>
+    <input type="color" id="cor" value="#ff7a1a">
+
+    <button onclick="incluirEvento()">Incluir evento</button>
+
+    <p class="hint">
+      Dica: escolha cores fixas por tipo de evento (reuniões, treinamentos, campanhas etc).
+      Os feriados já aparecem em cinza automaticamente.
+    </p>
+  </div>
+
+  <script>
+    // Mesmo nó do calendário
+    const DB_URL = "https://agenda-areia-ana-default-rtdb.firebaseio.com/eventos.json";
+    // Senha de admin
+    const SENHA = "areia2025";
+
+    async function incluirEvento() {
+      const senhaDigitada = document.getElementById("senha").value;
+      if (senhaDigitada !== SENHA) {
         alert("Senha incorreta.");
         return;
-    }
+      }
 
-    const data = document.getElementById("data").value;
-    const titulo = document.getElementById("titulo").value;
-    const cor = document.getElementById("cor").value;
+      const data = document.getElementById("data").value;
+      const titulo = document.getElementById("titulo").value.trim();
+      const cor = document.getElementById("cor").value;
 
-    if (!data || !titulo) {
-        alert("Preencha todos os campos.");
+      if (!data || !titulo) {
+        alert("Preencha a data e o título do evento.");
         return;
+      }
+
+      try {
+        // 1. Busca lista atual de eventos
+        const resp = await fetch(DB_URL);
+        let eventos = await resp.json();
+        if (!Array.isArray(eventos)) eventos = [];
+
+        // 2. Adiciona novo evento
+        eventos.push({ data, titulo, cor });
+
+        // 3. Salva de volta no Firebase
+        await fetch(DB_URL, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(eventos)
+        });
+
+        alert("Evento incluído com sucesso!");
+
+        // limpa campos (menos a senha, pra agilizar)
+        document.getElementById("data").value = "";
+        document.getElementById("titulo").value = "";
+
+      } catch (e) {
+        console.error(e);
+        alert("Erro ao salvar o evento. Confere se o Firebase está certo.");
+      }
     }
-
-    // 1. Busca eventos atuais
-    const resp = await fetch(URL);
-    let eventos = await resp.json();
-    if (!eventos) eventos = [];
-
-    // 2. Adiciona novo evento
-    eventos.push({ data, titulo, cor });
-
-    // 3. Salva de volta no Firebase
-    await fetch(URL, {
-        method: "PUT",
-        body: JSON.stringify(eventos),
-    });
-
-    alert("Evento adicionado com sucesso!");
-}
-</script>
+  </script>
+</body>
+</html>
