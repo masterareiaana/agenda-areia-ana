@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Calendário Corporativo</title>
+  <meta charset="UTF-8" />
+  <title>Calendário Corporativo – Grupo Areia Ana</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
     :root {
       --bg: #050814;
@@ -78,7 +80,7 @@
     }
 
     #datePicker {
-      display: none; /* aparece só no modo Dia */
+      display: none; /* só aparece no modo Dia */
     }
 
     .month-header {
@@ -106,7 +108,7 @@
       background: rgba(255,255,255,0.08);
     }
 
-    /* TABELA MENSAL */
+    /* TABELA DO CALENDÁRIO MENSAL */
 
     .cal-table {
       width: 100%;
@@ -242,7 +244,7 @@
       flex-shrink: 0;
     }
 
-    /* VISÕES LISTA (ANO / SEMESTRE / DIA) */
+    /* VISÕES ANO / SEMESTRE / DIA – em lista */
 
     .view-title {
       font-size: 14px;
@@ -306,7 +308,9 @@
 <body>
   <div class="wrapper">
     <h1>Calendário Corporativo</h1>
-    <p class="subtitle">Visual anual / semestral / mensal / dia, com feriados em cinza.</p>
+    <p class="subtitle">
+      Visual anual / semestral / mensal / dia, com feriados em cinza e eventos da empresa.
+    </p>
 
     <div class="top-bar">
       <div class="top-group">
