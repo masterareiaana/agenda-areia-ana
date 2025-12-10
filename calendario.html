@@ -5,16 +5,20 @@
   <title>Calendário Corporativo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- Fonte -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap">
+
   <style>
     :root {
       --bg: #050814;
-      --card: #0b1020;
-      --card-soft: #101629;
+      --bg-card: #0b1020;
+      --bg-soft: #101629;
       --accent: #ff7a1a;
       --accent-soft: #ff9b4a;
       --text: #f5f7ff;
       --text-soft: #c2c7ff;
-      --feriado: #555555; /* cinza mais escuro */
+      --feriado: #666666;
+      --border-soft: rgba(255, 255, 255, 0.06);
     }
 
     * {
@@ -24,335 +28,308 @@
     }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: radial-gradient(circle at top, #151821 0, #050814 45%, #02030a 100%);
       color: var(--text);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 24px;
+      padding: 32px 16px;
     }
 
-    .page {
+    .layout {
       width: 100%;
-      max-width: 1200px;
-      background: linear-gradient(145deg, #070b18 0, #050814 40%, #040614 100%);
+      max-width: 1280px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent 40%);
       border-radius: 24px;
-      padding: 24px 28px 28px;
-      box-shadow:
-        0 22px 60px rgba(0, 0, 0, 0.85),
-        0 0 0 1px rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.7);
+      padding: 24px 28px 32px;
     }
 
-    .page-header {
+    .layout-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
       gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
-    .title-block {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .title-block h1 {
-      font-size: 1.6rem;
+    .layout-title-block h1 {
+      font-size: 22px;
       font-weight: 700;
+      letter-spacing: 0.03em;
     }
 
-    .title-block p {
-      font-size: 0.9rem;
+    .layout-title-block p {
+      font-size: 13px;
       color: var(--text-soft);
+      margin-top: 4px;
     }
 
     .filters {
       display: flex;
+      gap: 12px;
       flex-wrap: wrap;
-      gap: 10px;
       align-items: center;
-      justify-content: flex-end;
     }
 
-    .filters label {
-      font-size: 0.8rem;
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
       color: var(--text-soft);
-      margin-right: 4px;
     }
 
-    .select {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      background: #060a18;
+    .filter-group label {
+      padding-left: 4px;
+    }
+
+    select {
+      background: var(--bg-card);
       border-radius: 999px;
-      padding: 4px 12px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 0.8rem;
-      color: var(--text-soft);
-      gap: 6px;
-    }
-
-    .select select {
-      background: transparent;
-      border: none;
-      color: inherit;
-      font-size: inherit;
+      border: 1px solid var(--border-soft);
+      color: var(--text);
+      padding: 6px 32px 6px 12px;
+      font-size: 13px;
       outline: none;
-      padding-right: 16px;
       cursor: pointer;
+      position: relative;
+      appearance: none;
     }
 
-    .select::after {
+    .select-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .select-wrapper::after {
       content: "▾";
-      font-size: 0.7rem;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
       color: var(--text-soft);
       pointer-events: none;
     }
 
-    /* Container do calendário */
-    .calendar-card {
-      margin-top: 8px;
-      background: var(--card);
+    /* CONTAINER PRINCIPAL DO CALENDÁRIO */
+    .calendar-wrapper {
+      margin-top: 10px;
+      background: var(--bg-card);
       border-radius: 18px;
-      padding: 18px 18px 16px;
-      box-shadow:
-        0 18px 40px rgba(0, 0, 0, 0.8),
-        0 0 0 1px rgba(255, 255, 255, 0.02);
+      padding: 20px 20px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    .month-header {
+    .calendar-header-inline {
       display: flex;
-      align-items: center;
       justify-content: center;
-      gap: 12px;
+      align-items: center;
+      gap: 8px;
       margin-bottom: 12px;
     }
 
     .month-title {
+      font-size: 16px;
       font-weight: 600;
-      font-size: 1rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
     }
 
     .nav-btn {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: none;
-      background: #060a18;
-      color: var(--text-soft);
-      display: flex;
+      border-radius: 999px;
+      background: var(--bg-soft);
+      border: 1px solid transparent;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 0.9rem;
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
-      transition: background 0.16s, transform 0.12s;
+      color: var(--text-soft);
+      font-size: 14px;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
     }
 
     .nav-btn:hover {
-      background: #0d1224;
+      background: #171d33;
+      border-color: rgba(255, 255, 255, 0.08);
       transform: translateY(-1px);
     }
 
-    .nav-btn:active {
-      transform: translateY(1px);
-    }
-
-    /* Tabela mensal */
-    .table {
+    /* TABELA MENSAL */
+    .calendar-table {
       width: 100%;
       border-collapse: collapse;
       table-layout: fixed;
-      border-radius: 14px;
-      overflow: hidden;
-      background: #050816;
+      font-size: 13px;
     }
 
-    .table thead {
+    .calendar-table thead {
       background: var(--accent);
-      color: #050814;
+      color: #111;
     }
 
-    .table th,
-    .table td {
-      padding: 10px 4px;
+    .calendar-table th,
+    .calendar-table td {
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 6px 4px 4px;
       text-align: center;
-      font-size: 0.8rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-      border-right: 1px solid rgba(255, 255, 255, 0.03);
+      vertical-align: top;
     }
 
-    .table th:last-child,
-    .table td:last-child {
-      border-right: none;
-    }
-
-    .table thead th {
+    .calendar-table th {
       font-weight: 600;
     }
 
-    .table tbody tr:last-child td {
-      border-bottom: none;
+    .col-week {
+      width: 60px;
     }
 
-    /* Célula do dia (MENSAL) */
-    .day-cell {
+    .calendar-day {
+      height: 52px;
       position: relative;
-      height: 54px;
-      background: #050816;
-      cursor: default;
-      transition: background 0.18s, box-shadow 0.18s, transform 0.1s;
-    }
-
-    .day-cell.empty {
-      background: #050816;
-      cursor: default;
-    }
-
-    .day-cell span.day-number {
-      position: relative;
-      font-size: 0.9rem;
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-    }
-
-    .day-cell.has-info {
       cursor: pointer;
+      background: transparent;
+      transition: background 0.12s ease, box-shadow 0.12s ease;
     }
 
-    .day-cell.has-info:hover {
-      background: #070b1b;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    .calendar-day.empty {
+      cursor: default;
     }
 
-    /* Linha colorida de evento / feriado (MENSAL) */
-    .day-line {
+    .calendar-day:hover:not(.empty) {
+      background: rgba(255, 255, 255, 0.04);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .day-number {
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 3px;
+    }
+
+    .markers {
       position: absolute;
+      left: 3px;
+      right: 3px;
       bottom: 4px;
-      left: 8%;
-      width: 84%;
-      height: 3px;
-      border-radius: 3px;
-      background: var(--accent);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
-    .day-line.feriado {
+    .marker-bar {
+      height: 3px;
+      border-radius: 999px;
+    }
+
+    .marker-feriado {
       background: var(--feriado);
+      opacity: 0.85;
+    }
+
+    .marker-evento {
+      background: var(--accent-soft);
     }
 
     /* ANUAL */
-    .year-grid {
+    .calendar-annual-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
       margin-top: 6px;
     }
 
-    .month-mini {
-      background: #050816;
-      border-radius: 14px;
-      padding: 10px;
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03);
+    .mini-month {
+      background: var(--bg-soft);
+      border-radius: 12px;
+      padding: 10px 12px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .month-mini h3 {
-      font-size: 0.85rem;
+    .mini-month-title {
+      font-size: 13px;
+      font-weight: 600;
       margin-bottom: 6px;
       text-align: center;
-      color: var(--text-soft);
     }
 
     .mini-table {
       width: 100%;
       border-collapse: collapse;
       table-layout: fixed;
+      font-size: 11px;
     }
 
     .mini-table th,
     .mini-table td {
-      padding: 4px 0;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 4px 2px 2px;
       text-align: center;
-      font-size: 0.65rem;
-      color: var(--text-soft);
+      position: relative;
     }
 
     .mini-table thead {
       background: var(--accent);
-      color: #050814;
-    }
-
-    .mini-table tbody td {
-      border-top: 1px solid rgba(255, 255, 255, 0.02);
-      position: relative;
-      height: 26px;
+      color: #111;
     }
 
     .mini-day {
-      position: relative;
-      cursor: default;
-    }
-
-    .mini-day span {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      color: var(--text);
-    }
-
-    .mini-day.has-info {
+      height: 32px;
       cursor: pointer;
     }
 
-    .mini-day.has-info:hover {
-      background: #070b1b;
+    .mini-day.empty {
+      cursor: default;
     }
 
-    .mini-line {
+    .mini-day:hover:not(.empty) {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .mini-markers {
       position: absolute;
+      left: 2px;
+      right: 2px;
       bottom: 2px;
-      left: 12%;
-      width: 76%;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .mini-marker-bar {
       height: 2px;
-      border-radius: 2px;
-      background: var(--accent);
+      border-radius: 999px;
     }
 
-    .mini-line.feriado {
-      background: var(--feriado);
-    }
-
-    /* Legenda */
+    /* LEGENDA */
     .legend {
       margin-top: 14px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: #050816;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.15);
       display: flex;
       flex-wrap: wrap;
+      gap: 14px;
       align-items: center;
-      gap: 10px;
-      font-size: 0.8rem;
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      justify-content: center;
+      font-size: 12px;
+      color: var(--text-soft);
     }
 
     .legend-title {
       font-weight: 600;
-      margin-right: 6px;
-    }
-
-    .legend-items {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 16px;
-      align-items: center;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-size: 11px;
     }
 
     .legend-item {
@@ -361,41 +338,32 @@
       gap: 6px;
     }
 
-    .legend-dot {
-      width: 9px;
-      height: 9px;
+    .legend-color {
+      width: 16px;
+      height: 4px;
       border-radius: 999px;
-      background: var(--accent);
+      background: var(--accent-soft);
     }
 
-    .legend-dot.feriado {
-      background: var(--feriado);
-    }
-
-    /* Modal de detalhes */
+    /* MODAL DE DETALHES */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(3, 5, 15, 0.82);
+      background: rgba(0, 0, 0, 0.6);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 50;
-    }
-
-    .modal-backdrop.show {
-      display: flex;
+      z-index: 999;
     }
 
     .modal {
-      background: #050816;
-      border-radius: 16px;
+      background: var(--bg-card);
+      border-radius: 18px;
       padding: 18px 20px 16px;
-      width: 100%;
       max-width: 420px;
-      box-shadow:
-        0 18px 50px rgba(0, 0, 0, 0.85),
-        0 0 0 1px rgba(255, 255, 255, 0.05);
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
     }
 
     .modal-header {
@@ -406,625 +374,649 @@
     }
 
     .modal-title {
-      font-size: 1rem;
+      font-size: 15px;
       font-weight: 600;
     }
 
     .modal-close {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
       border: none;
-      background: #080c1c;
+      background: transparent;
       color: var(--text-soft);
       cursor: pointer;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-size: 18px;
+      line-height: 1;
     }
 
     .modal-body {
-      font-size: 0.85rem;
+      font-size: 13px;
       color: var(--text-soft);
-    }
-
-    .event-list {
-      list-style: none;
-      margin-top: 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 4px;
     }
 
     .event-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
       padding: 6px 8px;
       border-radius: 10px;
-      background: #050a1a;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
-    .event-color {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
+    .event-label {
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .event-label span.color {
+      width: 14px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+    }
+
+    .event-type {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-soft);
+    }
+
+    .event-empty {
+      font-size: 13px;
+      color: var(--text-soft);
+      text-align: center;
+      padding: 10px 0 4px;
     }
 
     @media (max-width: 900px) {
-      .year-grid {
+      .calendar-annual-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
-    @media (max-width: 640px) {
-      .page {
-        padding: 18px 14px 18px;
+    @media (max-width: 680px) {
+      .layout {
+        padding: 18px 16px 22px;
       }
 
-      .page-header {
+      .layout-header {
         flex-direction: column;
         align-items: flex-start;
       }
 
-      .filters {
-        justify-content: flex-start;
+      .calendar-annual-grid {
+        grid-template-columns: minmax(0, 1fr);
       }
 
-      .month-header {
-        margin-bottom: 8px;
+      .calendar-table th,
+      .calendar-table td {
+        font-size: 11px;
+        padding: 5px 2px 3px;
       }
 
-      .table th,
-      .table td {
-        padding: 7px 2px;
-        font-size: 0.72rem;
-      }
-
-      .day-cell {
+      .calendar-day {
         height: 46px;
       }
     }
   </style>
 </head>
+
 <body>
-  <div class="page">
-    <div class="page-header">
-      <div class="title-block">
+  <main class="layout">
+    <header class="layout-header">
+      <div class="layout-title-block">
         <h1>Calendário Corporativo</h1>
         <p>Visão mensal ou anual, com feriados em cinza e eventos da empresa.</p>
       </div>
+
       <div class="filters">
-        <div class="select">
-          <label for="modo">Visualizar:</label>
-          <select id="modo">
-            <option value="mensal">Mensal</option>
-            <option value="anual">Anual</option>
-          </select>
+        <div class="filter-group">
+          <label for="viewMode">Visualizar:</label>
+          <div class="select-wrapper">
+            <select id="viewMode">
+              <option value="mensal">Mensal</option>
+              <option value="anual">Anual</option>
+            </select>
+          </div>
         </div>
 
-        <div class="select" id="filtro-mes-wrapper">
-          <label for="mes">Mês:</label>
-          <select id="mes"></select>
+        <div class="filter-group" id="monthWrapper">
+          <label for="monthSelect">Mês:</label>
+          <div class="select-wrapper">
+            <select id="monthSelect"></select>
+          </div>
         </div>
 
-        <div class="select">
-          <label for="ano">Ano:</label>
-          <select id="ano"></select>
+        <div class="filter-group">
+          <label for="yearSelect">Ano:</label>
+          <div class="select-wrapper">
+            <select id="yearSelect"></select>
+          </div>
         </div>
       </div>
-    </div>
+    </header>
 
-    <div class="calendar-card" id="calendar-mensal">
-      <div class="month-header">
-        <button class="nav-btn" id="prev-month">&lt;</button>
-        <div class="month-title" id="month-title"></div>
-        <button class="nav-btn" id="next-month">&gt;</button>
+    <section class="calendar-wrapper">
+      <!-- Cabeçalho do mês (apenas no mensal) -->
+      <div id="monthHeader" class="calendar-header-inline">
+        <button id="prevBtn" class="nav-btn" aria-label="Mês anterior">‹</button>
+        <div class="month-title" id="monthTitle"></div>
+        <button id="nextBtn" class="nav-btn" aria-label="Próximo mês">›</button>
       </div>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Semana</th>
-            <th>Seg</th>
-            <th>Ter</th>
-            <th>Qua</th>
-            <th>Qui</th>
-            <th>Sex</th>
-            <th>Sáb</th>
-            <th>Dom</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-mensal"></tbody>
-      </table>
-    </div>
 
-    <div class="calendar-card" id="calendar-anual" style="display:none;">
-      <div class="month-header">
-        <div class="month-title" id="year-title"></div>
-      </div>
-      <div class="year-grid" id="year-grid"></div>
-    </div>
+      <!-- Aqui entra o calendário (mensal ou anual) -->
+      <div id="calendarContainer"></div>
 
-    <!-- Legenda -->
-    <div class="legend">
-      <span class="legend-title">Legenda de eventos</span>
-      <div class="legend-items">
-        <div class="legend-item">
-          <span class="legend-dot feriado"></span>
-          <span>Feriado nacional</span>
-        </div>
-        <div id="legend-dynamic"></div>
-      </div>
-    </div>
-  </div>
+      <!-- Legenda -->
+      <div id="legend" class="legend"></div>
+    </section>
+  </main>
 
-  <!-- Modal -->
-  <div class="modal-backdrop" id="modal-backdrop">
+  <!-- Modal de detalhes -->
+  <div id="modalBackdrop" class="modal-backdrop">
     <div class="modal">
       <div class="modal-header">
-        <div class="modal-title" id="modal-title"></div>
-        <button class="modal-close" id="modal-close">×</button>
+        <div class="modal-title" id="modalTitle"></div>
+        <button class="modal-close" id="modalClose">&times;</button>
       </div>
-      <div class="modal-body">
-        <div id="modal-empty" style="display:none;">Nenhum evento cadastrado para esta data.</div>
-        <ul class="event-list" id="modal-list"></ul>
-      </div>
+      <div class="modal-body" id="modalBody"></div>
     </div>
   </div>
 
   <script>
-    // ====== CONFIG FIREBASE ======
-    const URL_EVENTOS =
-      "https://agenda-areia-ana-default-rtdb.firebaseio.com/eventos.json";
+    // ====== CONFIGURAÇÕES ======
+    const URL_DB = "https://agenda-areia-ana-default-rtdb.firebaseio.com/eventos.json";
 
     const mesesNomes = [
       "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
       "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ];
 
+    const diasSemanaCabecalho = ["Semana", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+    const diasSemanaMini = ["S", "T", "Q", "Q", "S", "S", "D"];
+
+    let eventos = [];        // lista vinda do Firebase
+    let eventosPorData = {}; // yyyy-mm-dd -> [eventos]
+    let feriadosPorData = {}; // yyyy-mm-dd -> [{titulo, cor}]
+    let legendaTipos = {};   // chave: label|cor -> {label, cor}
+
+    let modoAtual = "mensal";
     let anoAtual = new Date().getFullYear();
     let mesAtual = new Date().getMonth();
-    let modo = "mensal";
 
-    let eventos = [];           // lista completa
-    let eventosPorData = {};    // índice por data YYYY-MM-DD
-    let feriadosPorData = {};   // índice por data de feriados
+    const viewModeEl = document.getElementById("viewMode");
+    const monthSelectEl = document.getElementById("monthSelect");
+    const yearSelectEl = document.getElementById("yearSelect");
+    const monthWrapperEl = document.getElementById("monthWrapper");
+    const monthTitleEl = document.getElementById("monthTitle");
+    const calendarContainer = document.getElementById("calendarContainer");
+    const legendEl = document.getElementById("legend");
 
-    const modoSelect = document.getElementById("modo");
-    const mesSelect = document.getElementById("mes");
-    const anoSelect = document.getElementById("ano");
-    const mesWrapper = document.getElementById("filtro-mes-wrapper");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
 
-    const monthTitle = document.getElementById("month-title");
-    const yearTitle = document.getElementById("year-title");
-    const tbodyMensal = document.getElementById("tbody-mensal");
-    const yearGrid = document.getElementById("year-grid");
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalBody = document.getElementById("modalBody");
+    const modalClose = document.getElementById("modalClose");
 
-    const calendarMensal = document.getElementById("calendar-mensal");
-    const calendarAnual = document.getElementById("calendar-anual");
-
-    const legendDynamic = document.getElementById("legend-dynamic");
-
-    const prevMonthBtn = document.getElementById("prev-month");
-    const nextMonthBtn = document.getElementById("next-month");
-
-    const modalBackdrop = document.getElementById("modal-backdrop");
-    const modalClose = document.getElementById("modal-close");
-    const modalTitle = document.getElementById("modal-title");
-    const modalList = document.getElementById("modal-list");
-    const modalEmpty = document.getElementById("modal-empty");
-
-    // ====== FERIADOS FIXOS (BRASIL) ======
-    function gerarFeriados(ano) {
-      const feriadosFixos = [
-        { mes: 0,  dia: 1,  titulo: "Confraternização Universal" },
-        { mes: 3,  dia: 21, titulo: "Tiradentes" },
-        { mes: 4,  dia: 1,  titulo: "Dia do Trabalhador" },
-        { mes: 8,  dia: 7,  titulo: "Independência do Brasil" },
-        { mes: 10, dia: 2,  titulo: "Finados" },
+    // ====== FERiados fixos (Brasil) ======
+    function gerarFeriadosParaAno(ano) {
+      const fixos = [
+        { mes: 0, dia: 1, titulo: "Confraternização Universal" },
+        { mes: 3, dia: 21, titulo: "Tiradentes" },
+        { mes: 4, dia: 1, titulo: "Dia do Trabalhador" },
+        { mes: 8, dia: 7, titulo: "Independência do Brasil" },
+        { mes: 9, dia: 12, titulo: "Nossa Senhora Aparecida" },
+        { mes: 10, dia: 2, titulo: "Finados" },
         { mes: 10, dia: 15, titulo: "Proclamação da República" },
         { mes: 11, dia: 25, titulo: "Natal" }
       ];
 
-      const mapa = {};
-      feriadosFixos.forEach(f => {
-        const dataIso = formatarISO(ano, f.mes, f.dia);
-        mapa[dataIso] = {
-          data: dataIso,
-          titulo: f.titulo,
-          cor: "var(--feriado)",
-          feriado: true
-        };
+      const map = {};
+      fixos.forEach(f => {
+        const d = `${ano}-${String(f.mes + 1).padStart(2, "0")}-${String(f.dia).padStart(2, "0")}`;
+        map[d] = map[d] || [];
+        map[d].push({ titulo: f.titulo, cor: "var(--feriado)" });
       });
-      return mapa;
+      return map;
     }
 
-    function formatarISO(ano, mes, dia) {
-      const mm = String(mes + 1).padStart(2, "0");
-      const dd = String(dia).padStart(2, "0");
-      return `${ano}-${mm}-${dd}`;
-    }
-
-    // ====== EVENTOS (FIREBASE) ======
+    // ====== CARREGAR EVENTOS DO FIREBASE ======
     async function carregarEventos() {
       try {
-        const resp = await fetch(URL_EVENTOS);
+        const resp = await fetch(URL_DB);
         const data = await resp.json();
         eventos = [];
+        eventosPorData = {};
+
         if (data) {
           Object.keys(data).forEach(id => {
             const e = data[id];
-            if (!e || !e.data) return;
-            eventos.push({
+            if (!e || !e.data || !e.titulo) return;
+            const cor = e.cor || "#ff9b4a";
+            const item = {
               id,
               data: e.data,
-              titulo: e.titulo || "Evento",
-              cor: e.cor || "#ff7a1a"
-            });
+              titulo: e.titulo,
+              cor
+            };
+            eventos.push(item);
+            eventosPorData[item.data] = eventosPorData[item.data] || [];
+            eventosPorData[item.data].push(item);
           });
         }
       } catch (err) {
         console.error("Erro ao carregar eventos:", err);
       }
-
-      indexarEventos();
-      atualizarLegenda();
-      renderizar();
     }
 
-    function indexarEventos() {
-      eventosPorData = {};
-      eventos.forEach(e => {
-        if (!eventosPorData[e.data]) eventosPorData[e.data] = [];
-        eventosPorData[e.data].push(e);
-      });
-    }
+    // ====== LEGENDAS ======
+    function montarLegenda() {
+      legendaTipos = {};
+      legendEl.innerHTML = "";
 
-    function atualizarLegenda() {
-      legendDynamic.innerHTML = "";
+      // Feriado sempre entra
+      legendaTipos["Feriado nacional|var(--feriado)"] = {
+        label: "Feriado nacional",
+        cor: "var(--feriado)"
+      };
 
-      // pegar títulos únicos por cor
-      const mapa = {};
+      // Eventos
       eventos.forEach(e => {
-        const chave = `${e.titulo}__${e.cor}`;
-        if (!mapa[chave]) {
-          mapa[chave] = { titulo: e.titulo, cor: e.cor };
+        const key = `${e.titulo}|${e.cor}`;
+        if (!legendaTipos[key]) {
+          legendaTipos[key] = { label: e.titulo, cor: e.cor };
         }
       });
 
-      Object.values(mapa).forEach(item => {
+      // Render
+      const legendItems = Object.values(legendaTipos);
+
+      if (!legendItems.length) return;
+
+      legendEl.innerHTML = `
+        <span class="legend-title">Legenda de eventos</span>
+      `;
+
+      legendItems.forEach(item => {
         const div = document.createElement("div");
         div.className = "legend-item";
         div.innerHTML = `
-          <span class="legend-dot" style="background:${item.cor};"></span>
-          <span>${item.titulo}</span>
+          <span class="legend-color" style="background:${item.cor};"></span>
+          <span>${item.label}</span>
         `;
-        legendDynamic.appendChild(div);
+        legendEl.appendChild(div);
       });
     }
 
-    // ====== RENDERIZAÇÃO ======
-    function renderizarMensal() {
-      feriadosPorData = gerarFeriados(anoAtual);
+    // ====== RENDER MENSAL ======
+    function renderMensal() {
+      monthHeader.style.display = "flex";
+      calendarContainer.innerHTML = "";
 
-      monthTitle.textContent = `${mesesNomes[mesAtual]} ${anoAtual}`;
-      tbodyMensal.innerHTML = "";
+      const ano = anoAtual;
+      const mes = mesAtual;
 
-      const primeiroDiaSemana = new Date(anoAtual, mesAtual, 1).getDay(); // 0 = dom
-      const qtdeDiasMes = new Date(anoAtual, mesAtual + 1, 0).getDate();
+      // Título do mês
+      monthTitleEl.textContent = `${mesesNomes[mes]} ${ano}`;
 
-      // Começar na segunda (seg = 1, dom = 0/7)
-      let offset = primeiroDiaSemana === 0 ? 6 : primeiroDiaSemana - 1;
+      const primeiroDiaSemana = new Date(ano, mes, 1).getDay(); // 0 = Domingo
+      const ultimoDia = new Date(ano, mes + 1, 0).getDate();
+
+      // Montar feriados pro ano atual
+      feriadosPorData = gerarFeriadosParaAno(ano);
+
+      // Table
+      const table = document.createElement("table");
+      table.className = "calendar-table";
+
+      // Cabeçalho
+      const thead = document.createElement("thead");
+      const trHead = document.createElement("tr");
+      diasSemanaCabecalho.forEach((nome, index) => {
+        const th = document.createElement("th");
+        th.textContent = nome;
+        if (index === 0) th.classList.add("col-week");
+        trHead.appendChild(th);
+      });
+      thead.appendChild(trHead);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
 
       let dia = 1;
       let semana = 1;
 
-      while (dia <= qtdeDiasMes) {
+      // Começar na segunda-feira
+      // No JS, 0 = domingo, 1 = segunda...
+      // Cabeçalho está: Semana, Seg, Ter, Qua, Qui, Sex, Sáb, Dom
+      const offset = (primeiroDiaSemana + 6) % 7; // transforma domingo como 6
+
+      for (let linha = 0; linha < 6; linha++) {
         const tr = document.createElement("tr");
 
-        // coluna "Semana"
+        // Coluna "Semana"
         const tdSemana = document.createElement("td");
         tdSemana.textContent = semana;
-        tdSemana.style.background = "var(--accent)";
-        tdSemana.style.color = "#050814";
-        tdSemana.style.fontWeight = "600";
         tr.appendChild(tdSemana);
 
-        for (let i = 0; i < 7; i++) {
+        for (let col = 0; col < 7; col++) {
           const td = document.createElement("td");
-          td.classList.add("day-cell");
+          td.className = "calendar-day";
 
-          if (offset > 0) {
-            td.classList.add("empty");
-            tr.appendChild(td);
-            offset--;
-            continue;
-          }
-
-          if (dia > qtdeDiasMes) {
+          const numeroCelula = linha * 7 + col;
+          if (numeroCelula < offset || dia > ultimoDia) {
             td.classList.add("empty");
             tr.appendChild(td);
             continue;
           }
 
-          const dataIso = formatarISO(anoAtual, mesAtual, dia);
+          const dataStr = `${ano}-${String(mes + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
 
-          const span = document.createElement("span");
-          span.classList.add("day-number");
-          span.textContent = dia;
-          td.appendChild(span);
+          const spanNum = document.createElement("div");
+          spanNum.className = "day-number";
+          spanNum.textContent = dia;
 
-          const eventosDia = eventosPorData[dataIso] || [];
-          const feriado = feriadosPorData[dataIso];
+          const markers = document.createElement("div");
+          markers.className = "markers";
 
-          let corLinha = null;
-          let temInfo = false;
-
-          if (feriado) {
-            corLinha = "var(--feriado)";
-            temInfo = true;
-          } else if (eventosDia.length > 0) {
-            corLinha = eventosDia[0].cor || "var(--accent)";
-            temInfo = true;
+          // Feriados
+          if (feriadosPorData[dataStr]) {
+            feriadosPorData[dataStr].forEach(f => {
+              const mk = document.createElement("div");
+              mk.className = "marker-bar marker-feriado";
+              mk.style.background = "var(--feriado)";
+              markers.appendChild(mk);
+            });
           }
 
-          if (corLinha) {
-            const line = document.createElement("div");
-            line.classList.add("day-line");
-            if (feriado) line.classList.add("feriado");
-            line.style.background = corLinha;
-            td.appendChild(line);
+          // Eventos cadastrados
+          if (eventosPorData[dataStr]) {
+            eventosPorData[dataStr].forEach(e => {
+              const mk = document.createElement("div");
+              mk.className = "marker-bar marker-evento";
+              mk.style.background = e.cor || "var(--accent-soft)";
+              markers.appendChild(mk);
+            });
           }
 
-          if (temInfo) {
-            td.classList.add("has-info");
-            td.dataset.date = dataIso;
-            td.addEventListener("click", () => abrirModal(dataIso));
+          td.appendChild(spanNum);
+          if (markers.children.length) {
+            td.appendChild(markers);
           }
+
+          // Guardar a data na célula
+          td.dataset.date = dataStr;
 
           tr.appendChild(td);
           dia++;
         }
 
-        tbodyMensal.appendChild(tr);
+        tbody.appendChild(tr);
         semana++;
+        if (dia > ultimoDia) break;
       }
+
+      table.appendChild(tbody);
+      calendarContainer.appendChild(table);
     }
 
-    function renderizarAnual() {
-      feriadosPorData = gerarFeriados(anoAtual);
-      yearTitle.textContent = `${anoAtual}`;
-      yearGrid.innerHTML = "";
+    // ====== RENDER ANUAL ======
+    function renderAnual() {
+      monthHeader.style.display = "none";
+      calendarContainer.innerHTML = "";
 
-      for (let m = 0; m < 12; m++) {
+      const ano = anoAtual;
+      feriadosPorData = gerarFeriadosParaAno(ano);
+
+      const grid = document.createElement("div");
+      grid.className = "calendar-annual-grid";
+
+      for (let mes = 0; mes < 12; mes++) {
         const mini = document.createElement("div");
-        mini.className = "month-mini";
+        mini.className = "mini-month";
 
-        const h3 = document.createElement("h3");
-        h3.textContent = mesesNomes[m];
-        mini.appendChild(h3);
+        const title = document.createElement("div");
+        title.className = "mini-month-title";
+        title.textContent = mesesNomes[mes];
+        mini.appendChild(title);
 
         const table = document.createElement("table");
         table.className = "mini-table";
 
+        // head
         const thead = document.createElement("thead");
-        const trh = document.createElement("tr");
-        ["S", "T", "Q", "Q", "S", "S", "D"].forEach(d => {
+        const trHead = document.createElement("tr");
+        diasSemanaMini.forEach(d => {
           const th = document.createElement("th");
           th.textContent = d;
-          trh.appendChild(th);
+          trHead.appendChild(th);
         });
-        thead.appendChild(trh);
+        thead.appendChild(trHead);
         table.appendChild(thead);
 
         const tbody = document.createElement("tbody");
+        const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
+        const ultimoDia = new Date(ano, mes + 1, 0).getDate();
+        const offset = (primeiroDiaSemana + 6) % 7;
 
-        const primeiroDiaSemana = new Date(anoAtual, m, 1).getDay();
-        const qtdeDiasMes = new Date(anoAtual, m + 1, 0).getDate();
-
-        let offset = primeiroDiaSemana === 0 ? 6 : primeiroDiaSemana - 1;
         let dia = 1;
-
-        while (dia <= qtdeDiasMes) {
+        for (let linha = 0; linha < 6; linha++) {
           const tr = document.createElement("tr");
-
-          for (let i = 0; i < 7; i++) {
+          for (let col = 0; col < 7; col++) {
             const td = document.createElement("td");
+            td.className = "mini-day";
 
-            if (offset > 0) {
-              offset--;
+            const numeroCelula = linha * 7 + col;
+            if (numeroCelula < offset || dia > ultimoDia) {
+              td.classList.add("empty");
               tr.appendChild(td);
               continue;
             }
 
-            if (dia > qtdeDiasMes) {
-              tr.appendChild(td);
-              continue;
+            const dataStr = `${ano}-${String(mes + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
+
+            td.textContent = dia;
+
+            const markers = document.createElement("div");
+            markers.className = "mini-markers";
+
+            if (feriadosPorData[dataStr]) {
+              feriadosPorData[dataStr].forEach(() => {
+                const mk = document.createElement("div");
+                mk.className = "mini-marker-bar";
+                mk.style.background = "var(--feriado)";
+                markers.appendChild(mk);
+              });
             }
 
-            const dataIso = formatarISO(anoAtual, m, dia);
-            const span = document.createElement("span");
-            span.textContent = dia;
-
-            const eventosDia = eventosPorData[dataIso] || [];
-            const feriado = feriadosPorData[dataIso];
-
-            let corLinha = null;
-            let temInfo = false;
-
-            if (feriado) {
-              corLinha = "var(--feriado)";
-              temInfo = true;
-            } else if (eventosDia.length > 0) {
-              corLinha = eventosDia[0].cor || "var(--accent)";
-              temInfo = true;
+            if (eventosPorData[dataStr]) {
+              eventosPorData[dataStr].forEach(e => {
+                const mk = document.createElement("div");
+                mk.className = "mini-marker-bar";
+                mk.style.background = e.cor || "var(--accent-soft)";
+                markers.appendChild(mk);
+              });
             }
 
-            const wrapper = document.createElement("div");
-            wrapper.className = "mini-day";
-            wrapper.appendChild(span);
+            if (markers.children.length) td.appendChild(markers);
 
-            if (corLinha) {
-              const line = document.createElement("div");
-              line.className = "mini-line";
-              if (feriado) line.classList.add("feriado");
-              line.style.background = corLinha;
-              wrapper.appendChild(line);
-            }
-
-            if (temInfo) {
-              wrapper.classList.add("has-info");
-              wrapper.dataset.date = dataIso;
-              wrapper.addEventListener("click", () => abrirModal(dataIso));
-            }
-
-            td.appendChild(wrapper);
+            td.dataset.date = dataStr;
             tr.appendChild(td);
             dia++;
           }
-
           tbody.appendChild(tr);
+          if (dia > ultimoDia) break;
         }
 
         table.appendChild(tbody);
         mini.appendChild(table);
-        yearGrid.appendChild(mini);
+        grid.appendChild(mini);
       }
+
+      calendarContainer.appendChild(grid);
     }
 
-    function renderizar() {
-      if (modo === "mensal") {
-        calendarMensal.style.display = "";
-        calendarAnual.style.display = "none";
-        renderizarMensal();
-      } else {
-        calendarMensal.style.display = "none";
-        calendarAnual.style.display = "";
-        renderizarAnual();
-      }
-    }
+    // ====== MODAL DETALHES ======
+    function abrirModal(dateStr) {
+      const [ano, mes, dia] = dateStr.split("-");
+      const dataLabel = `${String(dia).padStart(2, "0")}/${String(mes).padStart(2, "0")}/${ano}`;
+      modalTitle.textContent = `Eventos em ${dataLabel}`;
+      modalBody.innerHTML = "";
 
-    // ====== MODAL ======
-    function abrirModal(dataIso) {
-      const eventosDia = eventosPorData[dataIso] || [];
-      const feriado = feriadosPorData[dataIso];
+      const lista = [];
 
-      modalList.innerHTML = "";
-
-      const [ano, mes, dia] = dataIso.split("-");
-      modalTitle.textContent = `Eventos em ${dia}/${mes}/${ano}`;
-
-      const listaItens = [];
-
-      if (feriado) {
-        listaItens.push({
-          titulo: feriado.titulo,
-          cor: "var(--feriado)"
+      if (feriadosPorData[dateStr]) {
+        feriadosPorData[dateStr].forEach(f => {
+          lista.push({
+            tipo: "Feriado",
+            titulo: f.titulo,
+            cor: "var(--feriado)"
+          });
         });
       }
 
-      eventosDia.forEach(e => {
-        listaItens.push({
-          titulo: e.titulo,
-          cor: e.cor || "var(--accent)"
+      if (eventosPorData[dateStr]) {
+        eventosPorData[dateStr].forEach(e => {
+          lista.push({
+            tipo: "Evento",
+            titulo: e.titulo,
+            cor: e.cor || "var(--accent-soft)"
+          });
         });
-      });
+      }
 
-      if (listaItens.length === 0) {
-        modalEmpty.style.display = "";
-        modalList.style.display = "none";
+      if (!lista.length) {
+        const div = document.createElement("div");
+        div.className = "event-empty";
+        div.textContent = "Nenhum evento para esta data.";
+        modalBody.appendChild(div);
       } else {
-        modalEmpty.style.display = "none";
-        modalList.style.display = "";
-        listaItens.forEach(item => {
-          const li = document.createElement("li");
-          li.className = "event-item";
-          li.innerHTML = `
-            <span class="event-color" style="background:${item.cor};"></span>
-            <span>${item.titulo}</span>
+        lista.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "event-item";
+          div.innerHTML = `
+            <div class="event-label">
+              <span class="color" style="background:${item.cor};"></span>
+              <span>${item.titulo}</span>
+            </div>
+            <span class="event-type">${item.tipo}</span>
           `;
-          modalList.appendChild(li);
+          modalBody.appendChild(div);
         });
       }
 
-      modalBackdrop.classList.add("show");
+      modalBackdrop.style.display = "flex";
     }
 
     function fecharModal() {
-      modalBackdrop.classList.remove("show");
+      modalBackdrop.style.display = "none";
     }
 
-    // ====== CONTROLES ======
-    modoSelect.addEventListener("change", () => {
-      modo = modoSelect.value;
-      mesWrapper.style.display = modo === "mensal" ? "inline-flex" : "none";
+    // ====== EVENTOS DE CLIQUE ======
+    calendarContainer.addEventListener("click", (ev) => {
+      const cell = ev.target.closest(".calendar-day, .mini-day");
+      if (!cell || cell.classList.contains("empty")) return;
+      const dateStr = cell.dataset.date;
+      if (!dateStr) return;
+      abrirModal(dateStr);
+    });
+
+    modalClose.addEventListener("click", fecharModal);
+    modalBackdrop.addEventListener("click", (ev) => {
+      if (ev.target === modalBackdrop) fecharModal();
+    });
+
+    // ====== CONTROLES / SELECTS ======
+    viewModeEl.addEventListener("change", () => {
+      modoAtual = viewModeEl.value;
+      monthWrapperEl.style.display = modoAtual === "mensal" ? "flex" : "none";
       renderizar();
     });
 
-    prevMonthBtn.addEventListener("click", () => {
+    monthSelectEl.addEventListener("change", () => {
+      mesAtual = Number(monthSelectEl.value);
+      renderizar();
+    });
+
+    yearSelectEl.addEventListener("change", () => {
+      anoAtual = Number(yearSelectEl.value);
+      renderizar();
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (modoAtual !== "mensal") return;
       mesAtual--;
       if (mesAtual < 0) {
         mesAtual = 11;
         anoAtual--;
-        anoSelect.value = anoAtual;
       }
-      mesSelect.value = mesAtual;
-      renderizar();
+      yearSelectEl.value = anoAtual;
+      monthSelectEl.value = mesAtual;
+      renderMensal();
     });
 
-    nextMonthBtn.addEventListener("click", () => {
+    nextBtn.addEventListener("click", () => {
+      if (modoAtual !== "mensal") return;
       mesAtual++;
       if (mesAtual > 11) {
         mesAtual = 0;
         anoAtual++;
-        anoSelect.value = anoAtual;
       }
-      mesSelect.value = mesAtual;
-      renderizar();
+      yearSelectEl.value = anoAtual;
+      monthSelectEl.value = mesAtual;
+      renderMensal();
     });
 
-    mesSelect.addEventListener("change", () => {
-      mesAtual = Number(mesSelect.value);
-      renderizar();
-    });
-
-    anoSelect.addEventListener("change", () => {
-      anoAtual = Number(anoSelect.value);
-      renderizar();
-    });
-
-    modalClose.addEventListener("click", fecharModal);
-    modalBackdrop.addEventListener("click", (e) => {
-      if (e.target === modalBackdrop) fecharModal();
-    });
+    // ====== RENDER GERAL ======
+    function renderizar() {
+      if (modoAtual === "mensal") {
+        renderMensal();
+      } else {
+        renderAnual();
+      }
+      montarLegenda();
+    }
 
     // ====== INICIALIZAÇÃO ======
-    function preencherSelects() {
-      // anos
+    function popularSelects() {
+      // anos (atual -2 até atual +2, por exemplo)
+      yearSelectEl.innerHTML = "";
       const anoBase = new Date().getFullYear();
-      for (let a = anoBase - 2; a <= anoBase + 5; a++) {
+      for (let a = anoBase - 2; a <= anoBase + 3; a++) {
         const opt = document.createElement("option");
         opt.value = a;
         opt.textContent = a;
-        anoSelect.appendChild(opt);
+        if (a === anoAtual) opt.selected = true;
+        yearSelectEl.appendChild(opt);
       }
-      anoSelect.value = anoAtual;
 
       // meses
+      monthSelectEl.innerHTML = "";
       mesesNomes.forEach((nome, idx) => {
         const opt = document.createElement("option");
         opt.value = idx;
         opt.textContent = nome;
-        mesSelect.appendChild(opt);
+        if (idx === mesAtual) opt.selected = true;
+        monthSelectEl.appendChild(opt);
       });
-      mesSelect.value = mesAtual;
     }
 
-    (async function init() {
-      preencherSelects();
+    async function init() {
+      popularSelects();
       await carregarEventos();
-    })();
+      renderizar();
+    }
+
+    init();
   </script>
 </body>
 </html>
