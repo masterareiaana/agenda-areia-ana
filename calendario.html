@@ -2,351 +2,454 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Calendário Corporativo – Grupo Areia Ana</title>
+  <title>Calendário Corporativo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     :root {
       --bg: #050814;
       --card: #0b1020;
       --card-soft: #101629;
-      --accent: #ffb200;
-      --accent-strong: #ff7a1a;
+      --accent: #ff7a1a;
+      --accent-soft: #ff9b4a;
       --text: #f5f7ff;
-      --soft: #c2c7ff;
-      --holiday: #808080;
+      --text-soft: #c2c7ff;
+      --holiday: #888888;
+      --grid-border: #20263d;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
-      font-family: Inter, system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
       margin: 0;
       padding: 24px;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, #151821 0, #050814 45%, #02030a 100%);
+      color: var(--text);
       display: flex;
       justify-content: center;
     }
 
-    .wrapper {
-      background: var(--card);
-      border-radius: 16px;
-      padding: 18px 20px 22px;
-      max-width: 780px;
+    .container {
       width: 100%;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    h1 {
-      font-size: 20px;
-      margin: 0 0 4px;
-      text-align: center;
+    .card {
+      background: radial-gradient(circle at top, #151a2b 0, #050814 55%, #02030a 100%);
+      border-radius: 24px;
+      padding: 32px 32px 28px;
+      box-shadow: 0 26px 60px rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .card-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .title {
+      font-size: 26px;
+      font-weight: 700;
     }
 
     .subtitle {
-      font-size: 12px;
-      color: var(--soft);
-      text-align: center;
-      margin-bottom: 12px;
+      font-size: 14px;
+      color: var(--text-soft);
     }
 
-    .top-bar {
+    .controls-row {
+      margin-top: 10px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
       flex-wrap: wrap;
-      margin-bottom: 10px;
-      font-size: 12px;
-      color: var(--soft);
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    .top-group {
+    .controls-left,
+    .controls-right {
       display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--text-soft);
+      display: inline-flex;
       align-items: center;
       gap: 6px;
-      flex-wrap: wrap;
     }
 
-    select,
-    input[type="date"] {
+    select {
       background: var(--card-soft);
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       color: var(--text);
-      padding: 4px 10px;
-      font-size: 12px;
+      padding: 6px 14px;
+      font-size: 13px;
       outline: none;
+      cursor: pointer;
     }
 
-    #datePicker {
-      display: none; /* só aparece no modo Dia */
-    }
-
-    .month-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 4px;
-      font-size: 14px;
-      font-weight: 600;
+    select:focus {
+      border-color: var(--accent-soft);
     }
 
     .nav-btn {
       background: var(--card-soft);
-      border: none;
-      color: var(--soft);
-      width: 28px;
-      height: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text);
       border-radius: 999px;
+      width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      font-size: 16px;
-      line-height: 0;
+      font-size: 14px;
+      padding: 0;
     }
 
     .nav-btn:hover {
-      background: rgba(255,255,255,0.08);
+      border-color: var(--accent-soft);
+      color: var(--accent-soft);
     }
 
-    /* TABELA DO CALENDÁRIO MENSAL */
-
-    .cal-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 11px;
-      background: var(--card-soft);
-      border-radius: 10px;
-      overflow: hidden;
+    /* -------- MENSAL -------- */
+    #monthlyView {
+      margin-top: 18px;
     }
 
-    .cal-table thead {
-      background: var(--accent);
-      color: #000;
-    }
-
-    .cal-table th,
-    .cal-table td {
-      padding: 4px 4px;
-      text-align: center;
-      border: 1px solid rgba(0,0,0,0.28);
-    }
-
-    .cal-table th {
-      font-weight: 600;
-    }
-
-    .week-col {
-      background: #f4c547;
-      color: #000;
-      font-weight: 600;
-      width: 50px;
-    }
-
-    .day-cell {
-      min-width: 24px;
-      height: 24px;
-      position: relative;
-      background: #1a2136;
-    }
-
-    .day-empty {
-      background: #0c1020;
-    }
-
-    .day-number {
-      font-size: 11px;
-    }
-
-    .day-has-event {
-      cursor: pointer;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16);
-    }
-
-    .day-has-event:hover {
-      background: #252f4a;
-    }
-
-    .event-bar {
-      position: absolute;
-      bottom: 2px;
-      left: 2px;
-      right: 2px;
-      height: 4px;
-      border-radius: 999px;
-      background: var(--accent-strong);
-    }
-
-    .event-bar-multi {
-      display: flex;
-      gap: 2px;
-      height: 4px;
-    }
-
-    .event-dot {
-      flex: 1;
-      border-radius: 999px;
-    }
-
-    /* DETALHES E LEGENDA */
-
-    .details {
-      margin-top: 10px;
-      padding: 10px;
-      background: var(--card-soft);
-      border-radius: 10px;
-      font-size: 11px;
-      min-height: 40px;
-    }
-
-    .details-title {
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    .event-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 1px;
-    }
-
-    .event-color {
-      width: 10px;
-      height: 10px;
-      border-radius: 3px;
-      flex-shrink: 0;
-    }
-
-    .legend {
-      margin-top: 10px;
-      padding-top: 8px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      font-size: 11px;
-    }
-
-    .legend-title {
-      font-size: 12px;
-      color: var(--soft);
-      margin-bottom: 4px;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 2px;
-    }
-
-    .legend-color {
-      width: 10px;
-      height: 10px;
-      border-radius: 3px;
-      flex-shrink: 0;
-    }
-
-    /* VISÕES ANO / SEMESTRE / DIA – em lista */
-
-    .view-title {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .month-block {
-      margin-bottom: 6px;
-      padding: 6px 8px;
-      background: var(--card-soft);
-      border-radius: 8px;
-    }
-
-    .month-name {
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    .month-list {
-      padding-left: 14px;
-      margin: 0;
-      font-size: 11px;
-    }
-
-    .month-list li {
-      margin-bottom: 1px;
-    }
-
-    .semestre-header {
+    .month-header-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .month-label {
+      color: var(--text-soft);
+    }
+
+    .calendar-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card-soft);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
+    }
+
+    .calendar-table thead {
+      background: #1a2135;
+    }
+
+    .calendar-table th,
+    .calendar-table td {
+      text-align: center;
+      padding: 10px 6px;
       font-size: 13px;
+      border-bottom: 1px solid var(--grid-border);
+      border-right: 1px solid var(--grid-border);
+    }
+
+    .calendar-table th:last-child,
+    .calendar-table td:last-child {
+      border-right: none;
+    }
+
+    .calendar-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .calendar-table th {
+      font-weight: 600;
+      color: var(--text-soft);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.03em;
+    }
+
+    .week-col {
+      background: #141a2a;
+      color: var(--text-soft);
+      font-size: 11px;
+      font-weight: 500;
+      width: 60px;
+    }
+
+    .day-cell {
+      cursor: pointer;
+      transition: background 0.12s ease-out, color 0.12s ease-out, transform 0.06s ease-out;
+    }
+
+    .day-cell:hover {
+      background: rgba(255, 255, 255, 0.02);
+      transform: translateY(-1px);
+    }
+
+    .day-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+    }
+
+    .today .day-number {
+      border: 1px solid var(--accent-soft);
+      color: var(--accent-soft);
+    }
+
+    .holiday .day-number {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--holiday);
+    }
+
+    .has-event .day-number {
+      background: var(--accent);
+      color: #050814;
       font-weight: 600;
     }
 
-    .semestre-btn {
-      background: var(--card-soft);
-      border: none;
-      color: var(--soft);
-      padding: 2px 8px;
+    .monthly-footer {
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: #080d1c;
+      font-size: 13px;
+      color: var(--text-soft);
+    }
+
+    .events-list {
+      margin-top: 6px;
+      padding-left: 18px;
+    }
+
+    .event-item {
+      margin-bottom: 2px;
+    }
+
+    .event-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
       border-radius: 999px;
-      cursor: pointer;
-      font-size: 11px;
+      margin-right: 6px;
+      vertical-align: middle;
     }
 
-    .semestre-btn:hover {
-      background: rgba(255,255,255,0.08);
+    /* -------- ANUAL -------- */
+    #annualView {
+      margin-top: 18px;
+      display: none; /* começa escondido, só aparece quando escolhe Anual */
     }
 
-    .day-view-empty {
-      font-size: 11px;
-      color: var(--soft);
+    .annual-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    @media (max-width: 1100px) {
+      .annual-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 900px) {
+      .annual-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 700px) {
+      .annual-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 520px) {
+      .annual-grid {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+      }
+    }
+
+    .mini-month {
+      background: var(--card-soft);
+      border-radius: 12px;
+      padding: 8px 8px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .mini-month-header {
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 4px;
+      color: var(--text-soft);
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10px;
+    }
+
+    .mini-table th,
+    .mini-table td {
+      text-align: center;
+      padding: 2px 1px;
+    }
+
+    .mini-table th {
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    .mini-day {
+      border-radius: 999px;
+      width: 18px;
+      height: 18px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mini-holiday {
+      color: var(--holiday);
+    }
+
+    .mini-event {
+      background: var(--accent);
+      color: #050814;
+      font-weight: 600;
+    }
+
+    /* -------- LEGENDA -------- */
+    .legend {
+      margin-top: 18px;
+      font-size: 13px;
+      color: var(--text-soft);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: 18px;
+      margin-top: 4px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .legend-dot.holiday-dot {
+      background: var(--holiday);
     }
   </style>
 </head>
 
 <body>
-  <div class="wrapper">
-    <h1>Calendário Corporativo</h1>
-    <p class="subtitle">
-      Visual anual / semestral / mensal / dia, com feriados em cinza e eventos da empresa.
-    </p>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <div class="title">Calendário Corporativo</div>
+        <div class="subtitle">
+          Visual mensal / anual, com feriados em cinza e eventos da empresa.
+        </div>
 
-    <div class="top-bar">
-      <div class="top-group">
-        <label for="viewMode">Visualizar:</label>
-        <select id="viewMode" onchange="alterarModo()">
-          <option value="mes">Mensal</option>
-          <option value="ano">Anual</option>
-          <option value="semestre">Semestral</option>
-          <option value="dia">Dia</option>
-        </select>
+        <div class="controls-row">
+          <div class="controls-left">
+            <label>
+              Visualizar:
+              <select id="viewMode">
+                <option value="mensal">Mensal</option>
+                <option value="anual">Anual</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="controls-right">
+            <label>
+              Ano:
+              <select id="yearSelect"></select>
+            </label>
+
+            <label id="monthWrapper">
+              Mês:
+              <select id="monthSelect"></select>
+            </label>
+
+            <button class="nav-btn" id="prevMonthBtn">&lt;</button>
+            <button class="nav-btn" id="nextMonthBtn">&gt;</button>
+          </div>
+        </div>
       </div>
 
-      <div class="top-group">
-        <span>Ano:</span>
-        <select id="yearSelect" onchange="alterarAno()"></select>
+      <!-- VISUAL MENSAL -->
+      <div id="monthlyView">
+        <div class="month-header-row">
+          <div class="month-label" id="monthTitle"></div>
+          <div></div>
+        </div>
 
-        <span id="monthLabelWrapper">
-          &nbsp;• Mês:
-          <select id="monthSelect" onchange="alterarMesSelect()"></select>
-        </span>
+        <table class="calendar-table">
+          <thead>
+          <tr>
+            <th class="week-col">Semana</th>
+            <th>Seg</th>
+            <th>Ter</th>
+            <th>Qua</th>
+            <th>Qui</th>
+            <th>Sex</th>
+            <th>Sáb</th>
+            <th>Dom</th>
+          </tr>
+          </thead>
+          <tbody id="calendarBody"></tbody>
+        </table>
 
-        <input type="date" id="datePicker" onchange="renderizarDia()">
+        <div class="monthly-footer" id="dayInfo">
+          Nenhuma data selecionada. Clique em um dia para ver os eventos.
+        </div>
       </div>
-    </div>
 
-    <div id="calendario"></div>
-
-    <div class="details" id="detalhes">
-      <div class="details-title">Nenhuma data selecionada</div>
-      <div style="color:#c2c7ff;">
-        No modo mensal clique em um dia com cor. No modo dia escolha uma data acima.
+      <!-- VISUAL ANUAL -->
+      <div id="annualView">
+        <div class="month-header-row">
+          <div class="month-label" id="annualTitle"></div>
+        </div>
+        <div class="annual-grid" id="annualGrid"></div>
       </div>
-    </div>
 
-    <div class="legend" id="legenda">
-      <div class="legend-title">Legenda de eventos</div>
+      <div class="legend">
+        <div>Legenda de eventos</div>
+        <div class="legend-item">
+          <span class="legend-dot holiday-dot"></span> Feriado nacional
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background: var(--accent);"></span> Evento cadastrado
+        </div>
+      </div>
     </div>
   </div>
 
